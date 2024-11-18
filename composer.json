@@ -7,11 +7,16 @@
             "Suxianjia\\Xianjiasitemap\\": "src/"
         }
     },
+
+
     "authors": [
         {
             "name": "dev",
             "email": "605011288@qq.com"
         }
     ],
-    "require": {}
+    "require": {
+        "php": "^7.0.8|>=8.2.25"
+    }
+
 }

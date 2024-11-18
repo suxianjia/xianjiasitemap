@@ -16,6 +16,7 @@ array
         |-- composer.json
 
 
+git@github.com:suxianjia/xianjiasitemap.git
 
 https://packagist.org/packages/submit
 

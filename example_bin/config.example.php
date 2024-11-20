@@ -6,7 +6,7 @@ return array(
 
 
 
-    'site' => "https://www.upetrol.net", //不要带斜杠
+    'site' => "https://www.u .com", //不要带斜杠
     'changefreq' =>  'weekly', // weekly daily     changefreq：页面内容更新频率。
     'priority' =>  0.5, //priority：相对于其他页面的优先权
     'lastmod' =>  date('Y-m-d H:i:s', time()) , //lastmod：页面最后修改时间

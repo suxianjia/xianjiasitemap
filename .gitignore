@@ -1,4 +1,5 @@
 
 !.gitignore
-src/config.php
 public_html
+example_bin/config.php
+

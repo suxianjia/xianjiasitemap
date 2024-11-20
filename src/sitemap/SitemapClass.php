@@ -1,6 +1,7 @@
 <?php
 
 namespace Suxianjia\Xianjiasitemap\sitemap;
+use Suxianjia\Xianjiasitemap\orm\db;
 use think\facade\Db as thinkDb;
 
 date_default_timezone_set('PRC');
@@ -77,7 +78,7 @@ class SitemapClass
             fwrite($file_stream, $map_row);
             $map_row = "";
             $index   = 0;
-            $db = \Suxianjia\Xianjiasitemap\orm\db::getInstance($config);
+            $db = db::getInstance($config);
             foreach ( $config['scan_url_list'] AS $key => $item ) {
                 $url = rtrim($item['loc'], '*')  ;
                 $url =   $config['site'].$url;
@@ -131,7 +132,7 @@ class SitemapClass
             fwrite($file_stream, $map_row);
             $map_row = "";
             $index   = 0;
-            $db = \Suxianjia\Xianjiasitemap\orm\db::getInstance($config);
+            $db = db::getInstance($config);
             foreach ( $config['scan_url_list'] AS $key => $item ) {
                 $url = rtrim($item['loc'], '*')  ;
                 $url =   $config['site'].$url;
@@ -350,7 +351,7 @@ border: #ccc 1px solid;
         fwrite($file_stream, $map_row);
         $map_row ="";
         $index   = 0;
-        $db = \Suxianjia\Xianjiasitemap\orm\db::getInstance($config);
+        $db = db::getInstance($config);
         foreach ( $config['scan_url_list'] AS $key => $item ) {
             $url = rtrim($item['loc'], '*')  ;
             $url =   $config['site'].$url;

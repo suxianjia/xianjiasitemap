@@ -33,7 +33,7 @@ return array(
                 'params'      => [], //'dsn' => 'mysql:dbname=testdb;host=127.0.0.1'
 
                 // 数据库名
-                'database' => 'www_u_petrol_com',
+                'database' => '',
                 // 数据库编码默认采用utf8
                 'charset'  => 'utf8',
                 // 数据库表前缀

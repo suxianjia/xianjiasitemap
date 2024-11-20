@@ -1,7 +1,7 @@
 <?php
 return array(
 //    'site' => "https://packagist.com", //不要带斜杠
-// https://www.upetrol.net/article/get?article_id=1115
+// https://      /article/get?article_id=1115
 
 
 

@@ -9,8 +9,9 @@ README.md 项目的说明文档
 
 |
 |-- src    包源码
-|    |-- build  功能代码
-|    |-- PFarr.php	包的门面
+|    |-- orm/ 数据库操作层 
+|    |-- sitemap/ 业务处理
+|    |-- fun.php	公共方法
 |
 |-- example  一些实例
 |

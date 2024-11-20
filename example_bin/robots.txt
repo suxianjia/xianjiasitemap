@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /index.php?mdu=cms*
+Disallow: /portal/
+Disallow: /activity.php*
+Disallow: /error.php*
+Disallow: /cate-*.html
+Disallow: /*.jpg$
+Disallow: /*.jpeg$
+Disallow: /*.gif$
+Disallow: /*.png$
+Disallow: /*.bmp$
+Sitemap: /sitemap.xml

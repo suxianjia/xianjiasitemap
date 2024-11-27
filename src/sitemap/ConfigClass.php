@@ -5,10 +5,11 @@ namespace Suxianjia\Xianjiasitemap\sitemap;
 class ConfigClass
 {
 
-    private static $instance;
+    private static ConfigClass $instance;
     private function __construct()    {    }
     private function __clone()    {    }
-    public static function getInstance(){
+    public static function getInstance(): ConfigClass
+    {
         if(!isset(self::$instance)){
             self::$instance = new self();
         }
@@ -19,11 +20,12 @@ class ConfigClass
      */
     private static $config;
 
-    public static function getConfig(  ){
+    public static function getConfig(){
         return  self::$config ;
     }
 
-    public static function setConfig(array $input_config){
+    public static function setConfig(array $input_config)
+    {
         self::$config = require __DIR__ . '/../config.php';
         if (!empty(  $input_config )){
             self::$config = array_merge(self::$config, $input_config);

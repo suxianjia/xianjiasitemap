@@ -30,7 +30,9 @@ return array(
                 // 数据库连接端口
                 'hostport'    => '3306',
                 // 数据库连接参数
-                'params'      => [], //'dsn' => 'mysql:dbname=testdb;host=127.0.0.1'
+                'params'      => [],
+                //'dsn' => 'mysql:dbname=testdb;host=127.0.0.1'
+                'dsn' => 'mysql:dbname=testdb;host=127.0.0.1',
 
                 // 数据库名
                 'database' => '',
@@ -74,11 +76,13 @@ return array(
             'type' => 'number',
             'min' =>  1990 ,
             'max' => 2000 ,
+            'offset' => 0,
             'listRows' => 1200,
             'tablename' => 'cms_article_base' ,
             'key' =>  'article_id',
             'field' => 'article_id,article_title AS title' ,
-            'where' => ['article_status' => 1 ]
+            'where' => ['article_status' => 1 ],
+             'whereStr' => '',
         ),
         'product' => array(
             'loc'=>'/product/detail?item_id=*',
@@ -88,11 +92,13 @@ return array(
             'type' => 'number',
             'min' =>  1990 ,
             'max' => 2000 ,
+            'offset' => 0,
             'listRows' => 5000,
             'tablename' => 'shop_product_base' ,
             'key' =>  'product_id',
             'field' => 'product_id ,product_name AS title',
-            'where' => []
+            'where' => [],
+            'whereStr' => '',
         ),
         // /store/get?store_id=3137
         'store' => array(
@@ -103,11 +109,13 @@ return array(
             'type' => 'number',
             'min' =>  1990 ,
             'max' => 2000 ,
+            'offset' => 0,
             'listRows' => 3000,
             'tablename' => 'shop_store_base' ,
             'key' =>  'store_id',
             'field' => 'store_id,store_name AS title',
-            'where' => ['store_is_open' => 1 ]
+            'where' => ['store_is_open' => 1 ],
+            'whereStr' => '',
         ),
         //   /exhibition/detail?exhibition_id=22  `exhibition_base` ORDER BY `exhibition_base`.`exhibition_id` ASC
 
@@ -119,11 +127,13 @@ return array(
             'type' => 'number',
             'min' =>  1990 ,
             'max' => 2000 ,
+            'offset' => 0,
             'listRows' => 20,
             'tablename' => 'exhibition_base' ,
             'key' =>  'exhibition_id',
             'field' => 'exhibition_id,exhibition_name AS title ',
-            'where' => [/*   'exhibition_status' => 1001  */ ]
+            'where' => [/*   'exhibition_status' => 1001  */ ],
+            'whereStr' => '',
         ),
 
 

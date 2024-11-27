@@ -6,44 +6,17 @@ namespace Composer\Autoload;
 
 class ComposerStaticInit8e68499b834246012cdfdd9f5bc90bd8
 {
-    public static $files = array (
-        '9b552a3cc426e3287cc811caefa3cf53' => __DIR__ . '/..' . '/topthink/think-helper/src/helper.php',
-        '35fab96057f1bf5e7aba31a8a6d5fdde' => __DIR__ . '/..' . '/topthink/think-orm/stubs/load_stubs.php',
-    );
-
     public static $prefixLengthsPsr4 = array (
-        't' => 
-        array (
-            'think\\' => 6,
-        ),
         'S' => 
         array (
             'Suxianjia\\Xianjiasitemap\\' => 25,
         ),
-        'P' => 
-        array (
-            'Psr\\SimpleCache\\' => 16,
-            'Psr\\Log\\' => 8,
-        ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'think\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/topthink/think-helper/src',
-            1 => __DIR__ . '/..' . '/topthink/think-orm/src',
-        ),
         'Suxianjia\\Xianjiasitemap\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src',
-        ),
-        'Psr\\SimpleCache\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/psr/simple-cache/src',
-        ),
-        'Psr\\Log\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/psr/log/src',
         ),
     );
 

@@ -4,7 +4,7 @@ error_reporting(E_ALL | E_STRICT);
 require __DIR__ . '/../vendor/autoload.php';
 
 use Suxianjia\Xianjiasitemap\sitemap\SitemapClass;
-use Suxianjia\Xianjiasitemap\sitemap\TestClass;
+
 
 
 
@@ -18,11 +18,13 @@ class index {
     //  php example_bin/test.php type=txt
     //  php example_bin/test.php type=xml
 
-    public function run(array  $args = []) {
+    public function run(array  $args = []): array|string
+    {
         $this_config = require __DIR__ . '/config.php';
-        $type = isset($args['type']) ? $args['type'] :   "xml";
-        $res =   SitemapClass::init($args )::set_config( $this_config )::generate($type);
-        return $res;
+
+        SitemapClass::setArgs($args);
+        SitemapClass::setConfig( $this_config );
+         return SitemapClass::generate();
     }
 
 

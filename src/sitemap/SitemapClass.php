@@ -1,8 +1,9 @@
 <?php
 
 namespace Suxianjia\Xianjiasitemap\sitemap;
-use Suxianjia\Xianjiasitemap\orm\db;
-use think\facade\Db as thinkDb;
+
+use Suxianjia\Xianjiasitemap\orm\pdo as db;
+
 
 date_default_timezone_set('PRC');
 require __DIR__ . '/../fun.php';
@@ -14,24 +15,32 @@ class SitemapClass
     private static $config;
 
     private static $args;
-    public static function init(array $args = []) : SitemapClass{
+    public static function setArgs(array $args = []) : void
+    {
+        $args['type'] = $args['type'] ?? "xml";
         self::$args = $args;
-        return new self;
     }
 
 
-    public static function set_config(array $array = []): SitemapClass
+    public static function setConfig(array $array = []):  void
     {
         self::$config = ConfigClass::getInstance()::setConfig($array)::getConfig();
-        return new self;
+
     }
 
-    public static function get_config( ):array
+    public static function getArgs() : array
+    {
+        return self::$args;
+    }
+
+    public static function getConfig( ):array
     {
         return self::$config;
     }
 
-    public static function generate( string $type = 'xml') :array|string {
+    public static function generate( ) :array|string {
+        $args = self::getArgs();
+        $type = $args['type'] ?? "xml";
         $res = [];
         switch ($type) {
             case 'xml':
@@ -59,7 +68,8 @@ class SitemapClass
 
 
     public static function generate_xml() :array|string {
-        $config = self::get_config();//_config();
+        $result = ['ExecuteCommand' =>  "php example_bin/test.php type=xml   (xml|txt|html)",   'error' => '', 'sql' => null,   'tempfile'=> " ", 'index' =>  null,  "time:" => date('Y-m-d H:i:s', time())] ;
+        $config = self::getConfig();//_config();
         //Begin stopwatch for statistics
         $start = microtime(true);
         try {
@@ -78,12 +88,15 @@ class SitemapClass
             fwrite($file_stream, $map_row);
             $map_row = "";
             $index   = 0;
-            $db = db::getInstance($config);
+             db::setConfig($config);
+            $db = db::getInstance();
             foreach ( $config['scan_url_list'] AS $key => $item ) {
                 $url = rtrim($item['loc'], '*')  ;
                 $url =   $config['site'].$url;
-                $page = 1;
-                $res_data = $db::getdata($page,$item ['listRows'],$item ['field'], $item ['where'],$item ['tablename'] ,$item ['key']);
+                $page = 1; // 'offset' => 0,
+                $res_data = $db::getdata($item ['offset'],$item ['listRows'],$item ['field'], $item ['whereStr'],$item ['tablename'] ,$item ['key']);
+                $result['sql'][] = $db::getSql()  ;
+                $result[ 'error' ] = $db::getMessage();
                 foreach ( $res_data as $v ) {
                     $index++;
                     $urls[$index] =    $url.$v[ $item ['key']  ];
@@ -102,9 +115,14 @@ class SitemapClass
             // Apply permissions
             chmod($tempfile,  $config['permissions'] );
         }catch (\Exception $e){
-            return ['error' => $e->getMessage() ];
+            $result[ 'error' ] = $e->getMessage() ;
         }
-        return [ 'tempfile'=> $tempfile , 'index' => $index,  "time:" => date('Y-m-d H:i:s', time())] ;
+
+
+
+        $result['tempfile'] = $tempfile;
+        $result['index'] = $index;
+        return $result;
     }
 
 
@@ -116,7 +134,8 @@ class SitemapClass
 
 // urllist.txt
     public static function generate_txt() :array|string {
-        $config = self::get_config();//_config();
+        $result = ['ExecuteCommand' =>  "php example_bin/test.php type=txt   (xml|txt|html)",   'error' => '', 'sql' => null,   'tempfile'=> " ", 'index' =>  null,  "time:" => date('Y-m-d H:i:s', time())] ;
+        $config = self::getConfig();//_config();
         //Begin stopwatch for statistics
         $start = microtime(true);
         try {
@@ -132,12 +151,15 @@ class SitemapClass
             fwrite($file_stream, $map_row);
             $map_row = "";
             $index   = 0;
-            $db = db::getInstance($config);
+            db::setConfig($config);
+            $db = db::getInstance( );
             foreach ( $config['scan_url_list'] AS $key => $item ) {
                 $url = rtrim($item['loc'], '*')  ;
                 $url =   $config['site'].$url;
                 $page = 1;
-                $res_data = $db::getdata($page,$item ['listRows'],$item ['field'],$item ['where'], $item ['tablename'] ,$item ['key']);
+                $res_data = $db::getdata($item ['offset'],$item ['listRows'],$item ['field'], $item ['whereStr'],$item ['tablename'] ,$item ['key']);
+                $result['sql'][] = $db::getSql()  ;
+                $result[ 'error' ] = $db::getMessage();
                 foreach ( $res_data as $v ) {
                     $index++;
                     $urls[$index] =    $url.$v[ $item ['key']  ];
@@ -152,15 +174,29 @@ class SitemapClass
             fclose($file_stream);
             // Apply permissions
             chmod($tempfile,  $config['permissions'] );
+//        }catch (\Exception $e){
+//            return ['error' => $e->getMessage() ];
+//        }
+//        return [ 'tempfile'=> $tempfile , 'index' => $index,  "time:" => date('Y-m-d H:i:s', time())] ;
+
         }catch (\Exception $e){
-            return ['error' => $e->getMessage() ];
+            $result[ 'error' ] = $e->getMessage() ;
         }
-        return [ 'tempfile'=> $tempfile , 'index' => $index,  "time:" => date('Y-m-d H:i:s', time())] ;
+
+
+
+        $result['tempfile'] = $tempfile;
+        $result['index'] = $index;
+        return $result;
+
+
     }
 // ------   $res = self::generate_html() ;
 
-public static function generate_html() :array|string{
-    $config = self::get_config();//_config();
+public static function generate_html() :array|string
+{
+    $result = ['ExecuteCommand' =>  "php example_bin/test.php type=html   (xml|txt|html)",   'error' => '', 'sql' => null,   'tempfile'=> " ", 'index' =>  null,  "time:" => date('Y-m-d H:i:s', time())] ;
+    $config = self::getConfig();//_config();
     //Begin stopwatch for statistics
     $start = microtime(true);
     try {
@@ -351,12 +387,15 @@ border: #ccc 1px solid;
         fwrite($file_stream, $map_row);
         $map_row ="";
         $index   = 0;
+        db::setConfig($config);
         $db = db::getInstance($config);
         foreach ( $config['scan_url_list'] AS $key => $item ) {
             $url = rtrim($item['loc'], '*')  ;
             $url =   $config['site'].$url;
             $page = 1;
-            $res_data = $db::getdata($page,$item ['listRows'],$item ['field'],$item ['where'], $item ['tablename'] ,$item ['key']);
+            $res_data = $db::getdata($item ['offset'],$item ['listRows'],$item ['field'], $item ['whereStr'],$item ['tablename'] ,$item ['key']);
+            $result['sql'][] = $db::getSql()  ;
+            $result[ 'error' ] = $db::getMessage();
             foreach ( $res_data as $v ) {
                 $index++;
                 $urls[$index] =    $url.$v[ $item ['key']  ];
@@ -397,10 +436,21 @@ Page created with ".$config['site']." - <a href=\"".$config['site']."\"> Sitemap
         fclose($file_stream);
         // Apply permissions
         chmod($tempfile,  $config['permissions'] );
+//    }catch (\Exception $e){
+//        return ['error' => $e->getMessage() ];
+//    }
+//    return [ 'tempfile'=> $tempfile , 'index' => $index,  "time:" => date('Y-m-d H:i:s', time())] ;
+
     }catch (\Exception $e){
-        return ['error' => $e->getMessage() ];
+        $result[ 'error' ] = $e->getMessage() ;
     }
-    return [ 'tempfile'=> $tempfile , 'index' => $index,  "time:" => date('Y-m-d H:i:s', time())] ;
+
+
+
+    $result['tempfile'] = $tempfile;
+    $result['index'] = $index;
+    return $result;
+
 }
 
 

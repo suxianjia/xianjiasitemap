@@ -32,7 +32,8 @@ return array(
                 // 数据库连接参数
                 'params'      => [],
                 //'dsn' => 'mysql:dbname=testdb;host=127.0.0.1'
-                'dsn' => 'mysql:dbname=testdb;host=127.0.0.1',
+                // //$dsn = 'mysql:dbname=demo;host=localhost;port=3306';
+                'dsn' => 'mysql:dbname=testdb;host=127.0.0.1;port=3306',
 
                 // 数据库名
                 'database' => '',

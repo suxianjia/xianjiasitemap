@@ -193,8 +193,7 @@ class SitemapClass
                 foreach ( $res_data as $v ) {
                     $index++;
                     $urls[$index] =    $url.$v[ $item ['key']  ];
-                    $map_row = " ";
-                    $map_row .= " ".  $urls[$index]  ."\n";
+                    $map_row =   $urls[$index]  ."\n";
 
 //                    fwrite($file_stream, $map_row);
                     $url_arr  [] = ['a' => $file_stream, 'b'=> $map_row ];
@@ -437,8 +436,7 @@ border: #ccc 1px solid;
             foreach ( $res_data as $v ) {
                 $index++;
                 $urls[$index] =    $url.$v[ $item ['key']  ];
-                $map_row = " ";
-                $map_row .= "<li class=\"lpage\">  <a href=\"".$urls[$index] ." \" title=\"". $v ['title']." \">".$urls[$index] ."</a> </li>\n";
+                $map_row =  "<li class=\"lpage\">  <a href=\"".$urls[$index] ." \" title=\"". $v ['title']." \">".$urls[$index] ."</a> </li>\n";
 //                fwrite($file_stream, $map_row);
                 $url_arr  [] = ['a' => $file_stream, 'b'=> $map_row ];
             }

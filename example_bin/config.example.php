@@ -67,6 +67,15 @@ return array(
     'permissions' => 0644,
 
 //    scan_url_list
+
+//    单个Sitemap文件：大小不超过10MB，且包含不超过50000个网址。如果网站所包含的网址超过50,000个，则可将列表分割成多个Sitemap文件，放在Sitemap索引中
+//单个Sitemap索引文件：大小不能超过500M，如果超过请提交多个Sitemap索引文件接口
+//您可以采用如下三种格式的文件向360搜索提交Sitemap，文件编码可以是UTF-8或GBK：
+//1）标准的XML格式文件
+//2）文本格式文件
+//3）Sitemap索引文件（可同时包含多个Sitemap文件）
+
+
     'scan_url_list' => array(
 
         'article' =>   array(

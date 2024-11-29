@@ -3,7 +3,8 @@
 
 
 
-function fun(){
+function fun(): string
+{
     return "fun";
 }
 

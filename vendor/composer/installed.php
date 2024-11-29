@@ -3,7 +3,7 @@
         'name' => 'suxianjia/xianjiasitemap',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => 'd0195bf013e4e7fe5a72fd88a09c7f56890ed200',
+        'reference' => 'ccdd6cdcd42d9ac9f00f4c3ed2412f76749eeb8e',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'suxianjia/xianjiasitemap' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => 'd0195bf013e4e7fe5a72fd88a09c7f56890ed200',
+            'reference' => 'ccdd6cdcd42d9ac9f00f4c3ed2412f76749eeb8e',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

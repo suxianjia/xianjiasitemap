@@ -4,6 +4,9 @@ namespace Suxianjia\Xianjiasitemap\sitemap;
 
 use Suxianjia\Xianjiasitemap\orm\pdo as db;
 
+use Suxianjia\Xianjiasitemap\client\Sitemap;
+use Suxianjia\Xianjiasitemap\client\SitemapIndex;
+
 
 date_default_timezone_set('PRC');
 require __DIR__ . '/../fun.php';
@@ -72,26 +75,37 @@ class SitemapClass
         $config = self::getConfig();//_config();
         //Begin stopwatch for statistics
         $start = microtime(true);
+        $index   = 0;
+        $tempfile = '';
         try {
 //Setup file stream
             $tempfile =   $config['file_dir'] . $config['file_xml'];//'sitemap.xml';
+
+
+            $sitemap = new Sitemap($tempfile);//__DIR__ . '/sitemap.xml');
+
 //Default html header makes browsers ignore \n
             header("Content-Type: text/plain");
             $file_stream = fopen($tempfile, "w") or die("Error: Could not create temporary file $tempfile" . "\n");
-            fwrite($file_stream, $config['xmlheader']);
-            $map_row = "\n<url>\n";
-            $map_row .= "   <loc>". $config['site'] .'/' ."</loc>\n";
-            $map_row .= "   <changefreq>". $config['changefreq']  ."</changefreq>\n";
-            $map_row .= "   <priority>". $config['priority']  ."</priority>\n";
-            $map_row .= "   <lastmod>". $config['lastmod']  ."</lastmod>\n";
-            $map_row .= "</url>\n";
-            fwrite($file_stream, $map_row);
+//            fwrite($file_stream, $config['xmlheader']);
+//            $map_row = "\n<url>\n";
+//            $map_row .= "   <loc>". $config['site'] .'/' ."</loc>\n";
+//            $map_row .= "   <changefreq>". $config['changefreq']  ."</changefreq>\n";
+//            $map_row .= "   <priority>". $config['priority']  ."</priority>\n";
+//            $map_row .= "   <lastmod>". $config['lastmod']  ."</lastmod>\n";
+//            $map_row .= "</url>\n";
+//            fwrite($file_stream, $map_row);
+
+
+            $sitemap->addItem($config['site'], time(), Sitemap::DAILY, 0.3);
+
             $map_row = "";
-            $index   = 0;
+
              db::setConfig($config);
             $db = db::getInstance();
+            $url_arr = [];
             foreach ( $config['scan_url_list'] AS $key => $item ) {
-                $url = rtrim($item['loc'], '*')  ;
+                $url = rtrim($item['loc'], '*');
                 $url =   $config['site'].$url;
                 $page = 1; // 'offset' => 0,
                 $res_data = $db::getdata($item ['offset'],$item ['listRows'],$item ['field'], $item ['whereStr'],$item ['tablename'] ,$item ['key']);
@@ -100,18 +114,32 @@ class SitemapClass
                 foreach ( $res_data as $v ) {
                     $index++;
                     $urls[$index] =    $url.$v[ $item ['key']  ];
-                    $map_row = "<url>\n";
-                    $map_row .= "    <loc>".  $urls[$index]  ."</loc>\n";
-                    $map_row .= "    <lastmod>". $item['lastmod']  ."</lastmod>\n";
-                    $map_row .= "    <changefreq>". $item['changefreq']  ."</changefreq>\n";
-                    $map_row .= "    <priority>". $item['priority']  ."</priority>\n";
-                    $map_row .= "</url>\n";
-                    fwrite($file_stream, $map_row);
+//                    $map_row = "<url>\n";
+//                    $map_row .= "    <loc>".  $urls[$index]  ."</loc>\n";
+//                    $map_row .= "    <lastmod>". $item['lastmod']  ."</lastmod>\n";
+//                    $map_row .= "    <changefreq>". $item['changefreq']  ."</changefreq>\n";
+//                    $map_row .= "    <priority>". $item['priority']  ."</priority>\n";
+//                    $map_row .= "</url>\n";
+//                    fwrite($file_stream, $map_row);
+
+//                    $sitemap->addItem($urls[$index], time(), Sitemap::DAILY, 0.3);
+                    $url_arr[] = ['a'=>$urls[$index],'b'=> time(),'c'=> Sitemap::DAILY,'d'=> 0.3];
+
                 }
             }
+
+
+            shuffle($url_arr  ) ;
+
+            foreach ( $url_arr   as $v ) {
+                $sitemap->addItem($v['a'],$v['b'],$v['c'],$v['d']);
+            }
+
+            $sitemap->write();
+
             // Finalize sitemap
-            fwrite($file_stream, "</urlset>\n");
-            fclose($file_stream);
+//            fwrite($file_stream, "</urlset>\n");
+//            fclose($file_stream);
             // Apply permissions
             chmod($tempfile,  $config['permissions'] );
         }catch (\Exception $e){
@@ -153,6 +181,8 @@ class SitemapClass
             $index   = 0;
             db::setConfig($config);
             $db = db::getInstance( );
+
+            $url_arr = [];
             foreach ( $config['scan_url_list'] AS $key => $item ) {
                 $url = rtrim($item['loc'], '*')  ;
                 $url =   $config['site'].$url;
@@ -166,8 +196,15 @@ class SitemapClass
                     $map_row = " ";
                     $map_row .= " ".  $urls[$index]  ."\n";
 
-                    fwrite($file_stream, $map_row);
+//                    fwrite($file_stream, $map_row);
+                    $url_arr  [] = ['a' => $file_stream, 'b'=> $map_row ];
                 }
+            }
+
+
+            shuffle($url_arr  ) ;
+            foreach ( $url_arr   as $v ) {
+                fwrite($v['a'],$v['b']);
             }
             // Finalize sitemap
 
@@ -389,6 +426,7 @@ border: #ccc 1px solid;
         $index   = 0;
         db::setConfig($config);
         $db = db::getInstance($config);
+        $url_arr = [];
         foreach ( $config['scan_url_list'] AS $key => $item ) {
             $url = rtrim($item['loc'], '*')  ;
             $url =   $config['site'].$url;
@@ -401,11 +439,15 @@ border: #ccc 1px solid;
                 $urls[$index] =    $url.$v[ $item ['key']  ];
                 $map_row = " ";
                 $map_row .= "<li class=\"lpage\">  <a href=\"".$urls[$index] ." \" title=\"". $v ['title']." \">".$urls[$index] ."</a> </li>\n";
-                fwrite($file_stream, $map_row);
+//                fwrite($file_stream, $map_row);
+                $url_arr  [] = ['a' => $file_stream, 'b'=> $map_row ];
             }
         }
 
-
+        shuffle($url_arr  ) ;
+        foreach ( $url_arr   as $v ) {
+            fwrite($v['a'],$v['b']);
+        }
 
 
 

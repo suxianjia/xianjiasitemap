@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": "^8.0|>=8.3.3",
-      "ext-pdo": "*"
+      "ext-pdo": "*",
+      "ext-xmlwriter": "*"
     }
 }

@@ -1,6 +1,15 @@
 <?php
 return array(
+    'site_list' => array(
+        "https://www.baidu.net",
+        "https://ru.baidu.net",
+        "https://en.baidu.net",
+    ),
+
+
+
     'site' => "https://www.baidu.com", //不要带斜杠 loc：页面永久链接地址
+    'use_list_site' => 1, //1 => site_list , 2 => site
     'changefreq' =>  'weekly', // weekly daily     changefreq：页面内容更新频率。
     'priority' =>  0.5, //priority：相对于其他页面的优先权
     'lastmod' =>  date('Y-m-d H:i:s', time()) , //lastmod：页面最后修改时间

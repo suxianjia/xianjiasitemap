@@ -41,19 +41,34 @@ class SitemapClass
         return self::$config;
     }
 
-    public static function generate(   ) :array|string {
+    public static function generate( ) :array|string {
         $args = self::getArgs();
         $type = $args['type'] ?? "xml"; //  $type = isset($args['type']) ? $args['type'] :   "xml";
         $res = [];
         switch ($type) {
             case 'xml':
-                $res = self::generate_xml() ;
+                $prefix = "";
+                $res[$prefix] = self::generate_xml($prefix) ;
+                $prefix = "ru_";
+                $res[$prefix] = self::generate_xml($prefix) ;
+                $prefix = "en_";
+                $res[$prefix] = self::generate_xml($prefix) ;
                 break;
             case 'txt':
-                $res = self::generate_txt() ;
+                $prefix = "";
+                $res[$prefix] = self::generate_txt($prefix) ;
+                $prefix = "ru_";
+                $res[$prefix] = self::generate_txt($prefix) ;
+                $prefix = "en_";
+                $res[$prefix] = self::generate_txt($prefix) ;
                 break;
             case 'html':
-                $res = self::generate_html() ;
+                $prefix = "";
+                $res[$prefix] = self::generate_html($prefix) ;
+                $prefix = "ru_";
+                $res[$prefix] = self::generate_html($prefix) ;
+                $prefix = "en_";
+                $res[$prefix] = self::generate_html($prefix) ;
                 break;
 
             default:
@@ -69,17 +84,28 @@ class SitemapClass
 //=  sitemap.xml
 
 
-
-    public static function generate_xml() :array|string {
+// $prefix = ""
+    public static function generate_xml($prefix = "") :array|string {
         $result = ['ExecuteCommand' =>  "php example_bin/test.php type=xml   (xml|txt|html)",   'error' => '', 'sql' => null,   'tempfile'=> " ", 'index' =>  null,  "time:" => date('Y-m-d H:i:s', time())] ;
         $config = self::getConfig();//_config();
+
+        $SITE = $config['site'];// $prefix
+        switch ( $prefix) {
+            case "" :       $SITE = $config['site_list'][0]; break;
+            case "ru_" :     $SITE = $config['site_list'][1]; break;
+            case "en_" :     $SITE = $config['site_list'][2]; break;
+        }
+
         //Begin stopwatch for statistics
         $start = microtime(true);
         $index   = 0;
         $tempfile = '';
         try {
+//-----
+
+
 //Setup file stream
-            $tempfile =   $config['file_dir'] . $config['file_xml'];//'sitemap.xml';
+            $tempfile =   $config['file_dir'] .$prefix. $config['file_xml'];//'sitemap.xml';
 
 
             $sitemap = new Sitemap($tempfile);//__DIR__ . '/sitemap.xml');
@@ -89,7 +115,7 @@ class SitemapClass
             $file_stream = fopen($tempfile, "w") or die("Error: Could not create temporary file $tempfile" . "\n");
 //            fwrite($file_stream, $config['xmlheader']);
 //            $map_row = "\n<url>\n";
-//            $map_row .= "   <loc>". $config['site'] .'/' ."</loc>\n";
+//            $map_row .= "   <loc>". $SITE .'/' ."</loc>\n";
 //            $map_row .= "   <changefreq>". $config['changefreq']  ."</changefreq>\n";
 //            $map_row .= "   <priority>". $config['priority']  ."</priority>\n";
 //            $map_row .= "   <lastmod>". $config['lastmod']  ."</lastmod>\n";
@@ -97,7 +123,8 @@ class SitemapClass
 //            fwrite($file_stream, $map_row);
 
 
-            $sitemap->addItem($config['site'], time(), Sitemap::DAILY, 0.3);
+
+            $sitemap->addItem( $SITE , time(), Sitemap::DAILY, 0.3);
 
             $map_row = "";
 
@@ -106,7 +133,7 @@ class SitemapClass
             $url_arr = [];
             foreach ( $config['scan_url_list'] AS $key => $item ) {
                 $url = rtrim($item['loc'], '*');
-                $url =   $config['site'].$url;
+                $url =   $SITE.$url;
                 $page = 1; // 'offset' => 0,
                 $res_data = $db::getdata($item ['offset'],$item ['listRows'],$item ['field'], $item ['whereStr'],$item ['tablename'] ,$item ['key']);
                 $result['sql'][] = $db::getSql()  ;
@@ -153,6 +180,8 @@ class SitemapClass
 
         $result['tempfile'] = $tempfile;
         $result['index'] = $index;
+        $result['site'] = $SITE;
+        $result['prefix'] = $prefix;
         return $result;
     }
 
@@ -164,20 +193,33 @@ class SitemapClass
 
 
 // urllist.txt
-    public static function generate_txt() :array|string {
+//$prefix = ""
+    public static function generate_txt($prefix = "") :array|string {
         $result = ['ExecuteCommand' =>  "php example_bin/test.php type=txt   (xml|txt|html)",   'error' => '', 'sql' => null,   'tempfile'=> " ", 'index' =>  null,  "time:" => date('Y-m-d H:i:s', time())] ;
         $config = self::getConfig();//_config();
+        $SITE = $config['site'];// $prefix
+        switch ( $prefix) {
+            case "" :       $SITE = $config['site_list'][0]; break;
+            case "ru_" :     $SITE = $config['site_list'][1]; break;
+            case "en_" :     $SITE = $config['site_list'][2]; break;
+        }
+
         //Begin stopwatch for statistics
         $start = microtime(true);
         try {
+
+
+
+
+
 //Setup file stream
-            $tempfile =   $config['file_dir'] . $config['file_txt'];//urllist.txt
+            $tempfile =   $config['file_dir'] . $prefix . $config['file_txt'];//urllist.txt
 //Default html header makes browsers ignore \n
             header("Content-Type: text/plain");
             $file_stream = fopen($tempfile, "w") or die("Error: Could not create temporary file $tempfile" . "\n");
 
             $map_row = "";
-            $map_row .= "". $config['site'] .'/' ."\n";
+            $map_row .= "". $SITE .'/' ."\n";
 
             fwrite($file_stream, $map_row);
             $map_row = "";
@@ -188,7 +230,7 @@ class SitemapClass
             $url_arr = [];
             foreach ( $config['scan_url_list'] AS $key => $item ) {
                 $url = rtrim($item['loc'], '*')  ;
-                $url =   $config['site'].$url;
+                $url =  $SITE.$url;
                 $page = 1;
                 $res_data = $db::getdata($item ['offset'],$item ['listRows'],$item ['field'], $item ['whereStr'],$item ['tablename'] ,$item ['key']);
                 $result['sql'][] = $db::getSql()  ;
@@ -226,21 +268,35 @@ class SitemapClass
 
         $result['tempfile'] = $tempfile;
         $result['index'] = $index;
+        $result['site'] = $SITE;
+        $result['prefix'] = $prefix;
         return $result;
 
 
     }
 // ------   $res = self::generate_html() ;
-
-public static function generate_html() :array|string
+//      $prefix = "";
+public static function generate_html($prefix = "") :array|string
 {
     $result = ['ExecuteCommand' =>  "php example_bin/test.php type=html   (xml|txt|html)",   'error' => '', 'sql' => null,   'tempfile'=> " ", 'index' =>  null,  "time:" => date('Y-m-d H:i:s', time())] ;
     $config = self::getConfig();//_config();
+    $SITE = $config['site'];// $prefix
+    switch ( $prefix) {
+        case "" :       $SITE = $config['site_list'][0]; break;
+        case "ru_" :     $SITE = $config['site_list'][1]; break;
+        case "en_" :     $SITE = $config['site_list'][2]; break;
+    }
+
     //Begin stopwatch for statistics
     $start = microtime(true);
     try {
+
+
+
+
+
 //Setup file stream
-        $tempfile =   $config['file_dir'] . $config['file_html'];//urllist.txt
+        $tempfile =   $config['file_dir'] .$prefix . $config['file_html'];//urllist.txt
 //Default html header makes browsers ignore \n
         header("Content-Type: text/plain");
         $file_stream = fopen($tempfile, "w") or die("Error: Could not create temporary file $tempfile" . "\n");
@@ -248,7 +304,7 @@ public static function generate_html() :array|string
         $map_row = "<!doctype html>
 <html lang=\"en\">
 <head>
-<title> Site Map  Page 1 - created with PRO Sitemap Service -  ".$config['site']."</title>
+<title> Site Map  Page 1 - created with PRO Sitemap Service -  ".$SITE."</title>
 <meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\" />
 <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
 <script type=\"text/javascript\">
@@ -413,14 +469,14 @@ border: #ccc 1px solid;
 <body>
 <div id=\"top\">
 <nav>
-".$config['site']." HTML Site Map</nav>
+". $SITE ." HTML Site Map</nav>
 <h3>
 
-<a href=\"".$config['site'] ."\">".$config['site']." Homepage</a>
+<a href=\"".$SITE ."\">".$SITE." Homepage</a>
 </h3></div>
 <div id=\"cont\">
 <ul class=\"ultree level-1 has-pages\">
-<li class=\"lhead\" title=\"Click to toggle\">".$config['site']." </li>
+<li class=\"lhead\" title=\"Click to toggle\">".$SITE." </li>
 <li class=\"lpagelist\">
 <ul class=\"ulpages\"> \n";
         fwrite($file_stream, $map_row);
@@ -431,7 +487,7 @@ border: #ccc 1px solid;
         $url_arr = [];
         foreach ( $config['scan_url_list'] AS $key => $item ) {
             $url = rtrim($item['loc'], '*')  ;
-            $url =   $config['site'].$url;
+            $url =  $SITE.$url;
             $page = 1;
             $res_data = $db::getdata($item ['offset'],$item ['listRows'],$item ['field'], $item ['whereStr'],$item ['tablename'] ,$item ['key']);
             $result['sql'][] = $db::getSql()  ;
@@ -439,7 +495,7 @@ border: #ccc 1px solid;
             foreach ( $res_data as $v ) {
                 $index++;
                 $urls[$index] =    $url.$v[ $item ['key']  ];
-                $map_row =  "<li class=\"lpage\">  <a href=\"".$urls[$index] ." \" title=\"". $v ['title']." \">".$urls[$index] ."</a> </li>\n";
+                $map_row =  "<li class=\"lpage\">  <a href=\"".$urls[$index] ."\" title=\"". $v ['title']."\" >".$urls[$index] ."</a> </li>\n";
 //                fwrite($file_stream, $map_row);
                 $url_arr  [] = ['a' => $file_stream, 'b'=> $map_row ];
             }
@@ -455,7 +511,7 @@ border: #ccc 1px solid;
 
 
 
-        $map_row =" <li class=\"lhead\" title=\"Click to toggle\">".$config['site']."<span class=\"lcount\">".$index."  page</span></li>
+        $map_row =" <li class=\"lhead\" title=\"Click to toggle\">".$SITE."<span class=\"lcount\">".$index."  page</span></li>
 </ul>
 </li>
 </ul>
@@ -465,11 +521,11 @@ border: #ccc 1px solid;
 <span>Last updated: " . date("Y-m-d H:i:s" , time())  . "<br />
 Total pages: ".$index."</span>
 
-Page created with ".$config['site']." - <a href=\"".$config['site']."\"> Sitemap Service</a>
+Page created with ".$SITE." - <a href=\"".$SITE."\"> Sitemap Service</a>
 </div>
 </body>
 </html>";
-//        $map_row .= "". $config['site'] .'/' ."\n";
+
 
         fwrite($file_stream, $map_row);
         $map_row =" ";
@@ -492,6 +548,8 @@ Page created with ".$config['site']." - <a href=\"".$config['site']."\"> Sitemap
 
     $result['tempfile'] = $tempfile;
     $result['index'] = $index;
+    $result['site'] = $SITE;
+    $result['prefix'] = $prefix;
     return $result;
 
 }

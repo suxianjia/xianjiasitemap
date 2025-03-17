@@ -41,9 +41,9 @@ class SitemapClass
         return self::$config;
     }
 
-    public static function generate( ) :array|string {
+    public static function generate(   ) :array|string {
         $args = self::getArgs();
-        $type = $args['type'] ?? "xml";
+        $type = $args['type'] ?? "xml"; //  $type = isset($args['type']) ? $args['type'] :   "xml";
         $res = [];
         switch ($type) {
             case 'xml':
@@ -123,7 +123,10 @@ class SitemapClass
 //                    fwrite($file_stream, $map_row);
 
 //                    $sitemap->addItem($urls[$index], time(), Sitemap::DAILY, 0.3);
-                    $url_arr[] = ['a'=>$urls[$index],'b'=> time(),'c'=> Sitemap::DAILY,'d'=> 0.3];
+
+//  选填,此链接相对于其他链接的优先权比值，定于0.0-1.0之间  
+                    $update_week = rand(0, 10) / 10.0;
+                    $url_arr[] = ['a'=>$urls[$index],'b'=> time(),'c'=> Sitemap::DAILY,'d'=>$update_week];
 
                 }
             }

@@ -99,7 +99,7 @@ port 						 :     3309
 ['id'=> 0,'loc'=> '/',                                              'title_ru'=> 'Домой-sitename-*******-ru.sitename.net',                                                      'title_en'=> 'home-sitename-*******-en.sitename.net',                                      'title'=> '首页-*******-www.sitename.net','times'=>   date('Y-m-d H:i:s', time())  ,'priority' =>  ( mt_rand(1, 10) / 10)],
 ['id'=> 0,'loc'=> '/login',                                         'title_ru'=> 'Войти в систему-sitename-*******-ru.sitename.net',                                            'title_en'=> 'login-sitename-*******-en.sitename.net',                                     'title'=> '登录-*******-www.sitename.net','times'=>   date('Y-m-d H:i:s', time())  ,'priority' =>  ( mt_rand(1, 10) / 10)],
 ['id'=> 0,'loc'=> '/register',                                      'title_ru'=> 'Регистрация-sitename-*******-ru.sitename.net',                                                'title_en'=> 'register-sitename-*******-en.sitename.net',                                  'title'=> '注册-*******-www.sitename.net','times'=>   date('Y-m-d H:i:s', time())  ,'priority' =>  ( mt_rand(1, 10) / 10)],
-                                                     'title_en'=> 'search for-sitename-*******-en.sitename.net',                                'title'=> '搜索-*******-www.sitename.net','times'=>   date('Y-m-d H:i:s', time())  ,'priority' =>  ( mt_rand(1, 10) / 10)],
+ 
 
 
 

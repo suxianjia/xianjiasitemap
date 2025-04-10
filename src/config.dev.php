@@ -34,17 +34,17 @@ port 						 :     3309
                 // 数据库类型
                 'type'     => 'mysql',
                 // 主机地址
-                // 'hostname' =>"rm-7xvqz50859y717cv0.mysql.rds.aliyuncs.com",// '127.0.0.1',
-                    'hostname' =>"readonly-0859y717cv0-clusterd93.mysql.rds.aliyuncs.com",
+                // 'hostname' =>" ***** ",// '127.0.0.1',
+                    'hostname' =>"r ***** ",
                     // "hostname"=> '127.0.0.1',
                 // 用户名
-                // 'username' => 'w_api_user_master8',// 'root',
-                'username' => 'r_api_user_readonly',// 'root',
+                // 'username' => ' ***** ',// 'root',
+                'username' => ' ***** ',// 'root',
                 // 'username' =>   'root',
                 // 数据库密码
-                // 'password'    => "Wdbfd_tdh@8Wirte0Db",// '654321mm',
-                'password'    => 'Rdbfd_tdh@8readonly80Db',// '654321mm',
-                // 'password'    =>  '654321mm',
+                // 'password'    => " ***** @ ***** ",// ' ***** ',
+                'password'    => ' ***** @ ***** ',// ' ***** ',
+                // 'password'    =>  ' ***** ',
                 // 数据库连接端口
                 // 'hostport'    => 3308,
                 'hostport'    => 3309,
@@ -53,11 +53,11 @@ port 						 :     3309
                 'params'      => [], //'dsn' => 'mysql:dbname=testdb;host=127.0.0.1;port=3306'
 //$dsn = 'mysql:dbname=demo;host=localhost;port=3306';
 
-                //   'dsn' => 'mysql:dbname=www_u_petrol_com;host=rm-7xvqz50859y717cv0.mysql.rds.aliyuncs.com;port=3308',
-                'dsn' =>  'mysql:dbname=www_u_petrol_com;host=readonly-0859y717cv0-clusterd93.mysql.rds.aliyuncs.com;port=3309',
-                // 'dsn' =>  'mysql:dbname=www_u_petrol_com;host=127.0.0.1;port=3306',
+                //   'dsn' => 'mysql:dbname= ***** ;host=rm- ***** . ***** .rds. ***** .com;port=3308',
+                'dsn' =>  'mysql:dbname= ***** ;host= ***** - ***** - ***** . ***** .rds. ***** .com;port=3309',
+                // 'dsn' =>  'mysql:dbname= ***** ;host=127.0.0.1;port=3306',
                 // 数据库名
-                'database' => 'www_u_petrol_com',
+                'database' => ' ***** ',
                 // 数据库编码默认采用utf8
                 'charset'  => 'utf8',
                 // 数据库表前缀

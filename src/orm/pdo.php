@@ -54,12 +54,28 @@ class pdo
 
     }
 
+
+ 
+    // Existing methods and properties
+
+    public static function getcounts($whereStr, $tablename) {
+        $client = self::createclient();
+        // Example implementation: Adjust this query as per your database schema
+        $sql = "SELECT COUNT(*) as count FROM {$tablename} WHERE {$whereStr}";
+        self::setSql( $sql  );
+        $stmt = $client->query($sql);
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+        return $result['count'] ?? 0;
+    }
+ 
+
+
     public static  function getdata($offset = 0,$limit = 10,$field = "", $whereStr =  "1 = 1", $tablename = 'account_ad' , $key='id'):array | null
     {
         $client = self::createclient();
         if ($client == null ) { return null;}
         if ($whereStr == '') { $whereStr == '1 = 1';}
-        $sql = "SELECT {$field} FROM {$tablename} WHERE {$whereStr} ORDER BY {$key} DESC LIMIT :start,:num";
+        $sql = "SELECT {$field} FROM `{$tablename}` WHERE {$whereStr} ORDER BY `{$key}` DESC LIMIT  :start , :num  ";
         self::setSql( $sql  );
         $stmt = $client->prepare($sql);
         $stmt->bindValue(':start', $offset, \PDO::PARAM_INT);

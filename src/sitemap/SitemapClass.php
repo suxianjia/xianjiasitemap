@@ -6,7 +6,7 @@ use Suxianjia\Xianjiasitemap\orm\pdo as db;
 
 use Suxianjia\Xianjiasitemap\client\Sitemap;
 use Suxianjia\Xianjiasitemap\client\SitemapIndex;
-
+use Suxianjia\Xianjiasitemap\client\SitemapHtml;
 
 date_default_timezone_set('PRC');
 require __DIR__ . '/../fun.php';
@@ -41,519 +41,238 @@ class SitemapClass
         return self::$config;
     }
 
-    public static function generate( ) :array|string {
-        $args = self::getArgs();
-        $type = $args['type'] ?? "xml"; //  $type = isset($args['type']) ? $args['type'] :   "xml";
+    public static function generate( ) :array {
         $res = [];
-        switch ($type) {
-            case 'xml':
-                $prefix = "";
-                $res[$prefix] = self::generate_xml($prefix) ;
-                $prefix = "ru_";
-                $res[$prefix] = self::generate_xml($prefix) ;
-                $prefix = "en_";
-                $res[$prefix] = self::generate_xml($prefix) ;
-                break;
-            case 'txt':
-                $prefix = "";
-                $res[$prefix] = self::generate_txt($prefix) ;
-                $prefix = "ru_";
-                $res[$prefix] = self::generate_txt($prefix) ;
-                $prefix = "en_";
-                $res[$prefix] = self::generate_txt($prefix) ;
-                break;
-            case 'html':
-                $prefix = "";
-                $res[$prefix] = self::generate_html($prefix) ;
-                $prefix = "ru_";
-                $res[$prefix] = self::generate_html($prefix) ;
-                $prefix = "en_";
-                $res[$prefix] = self::generate_html($prefix) ;
-                break;
-
-            default:
-        }
+        $res['all'] = self::GenerateAllFiles( ) ;
         return $res ;
     }
 
 
+ 
 
 
+ 
 
-
-//=  sitemap.xml
-
-
-// $prefix = ""
-    public static function generate_xml($prefix = "") :array|string {
-        $result = ['ExecuteCommand' =>  "php example_bin/test.php type=xml   (xml|txt|html)",   'error' => '', 'sql' => null,   'tempfile'=> " ", 'index' =>  null,  "time:" => date('Y-m-d H:i:s', time())] ;
-        $config = self::getConfig();//_config();
-
-        $SITE = $config['site'];// $prefix
-        switch ( $prefix) {
-            case "" :       $SITE = $config['site_list'][0]; break;
-            case "ru_" :     $SITE = $config['site_list'][1]; break;
-            case "en_" :     $SITE = $config['site_list'][2]; break;
-        }
-
-        //Begin stopwatch for statistics
-        $start = microtime(true);
-        $index   = 0;
-        $tempfile = '';
-        try {
-//-----
-
-
-//Setup file stream
-            $tempfile =   $config['file_dir'] .$prefix. $config['file_xml'];//'sitemap.xml';
-
-
-            $sitemap = new Sitemap($tempfile);//__DIR__ . '/sitemap.xml');
-
-//Default html header makes browsers ignore \n
-            header("Content-Type: text/plain");
-            $file_stream = fopen($tempfile, "w") or die("Error: Could not create temporary file $tempfile" . "\n");
-//            fwrite($file_stream, $config['xmlheader']);
-//            $map_row = "\n<url>\n";
-//            $map_row .= "   <loc>". $SITE .'/' ."</loc>\n";
-//            $map_row .= "   <changefreq>". $config['changefreq']  ."</changefreq>\n";
-//            $map_row .= "   <priority>". $config['priority']  ."</priority>\n";
-//            $map_row .= "   <lastmod>". $config['lastmod']  ."</lastmod>\n";
-//            $map_row .= "</url>\n";
-//            fwrite($file_stream, $map_row);
-
-
-
-            $sitemap->addItem( $SITE , time(), Sitemap::DAILY, 0.3);
-
-            $map_row = "";
-
-             db::setConfig($config);
-            $db = db::getInstance();
-            $url_arr = [];
-            foreach ( $config['scan_url_list'] AS $key => $item ) {
-                $url = rtrim($item['loc'], '*');
-                $url =   $SITE.$url;
-                $page = 1; // 'offset' => 0,
-                $res_data = $db::getdata($item ['offset'],$item ['listRows'],$item ['field'], $item ['whereStr'],$item ['tablename'] ,$item ['key']);
-                $result['sql'][] = $db::getSql()  ;
-                $result[ 'error' ] = $db::getMessage();
-                foreach ( $res_data as $v ) {
-                    $index++;
-                    $urls[$index] =    $url.$v[ $item ['key']  ];
-//                    $map_row = "<url>\n";
-//                    $map_row .= "    <loc>".  $urls[$index]  ."</loc>\n";
-//                    $map_row .= "    <lastmod>". $item['lastmod']  ."</lastmod>\n";
-//                    $map_row .= "    <changefreq>". $item['changefreq']  ."</changefreq>\n";
-//                    $map_row .= "    <priority>". $item['priority']  ."</priority>\n";
-//                    $map_row .= "</url>\n";
-//                    fwrite($file_stream, $map_row);
-
-//                    $sitemap->addItem($urls[$index], time(), Sitemap::DAILY, 0.3);
-
-//  选填,此链接相对于其他链接的优先权比值，定于0.0-1.0之间  
-                    $update_week = rand(0, 10) / 10.0;
-                    $url_arr[] = ['a'=>$urls[$index],'b'=> time(),'c'=> Sitemap::DAILY,'d'=>$update_week];
-
-                }
-            }
-
-
-            shuffle($url_arr  ) ;
-
-            foreach ( $url_arr   as $v ) {
-                $sitemap->addItem($v['a'],$v['b'],$v['c'],$v['d']);
-            }
-
-            $sitemap->write();
-
-            // Finalize sitemap
-//            fwrite($file_stream, "</urlset>\n");
-//            fclose($file_stream);
-            // Apply permissions
-            chmod($tempfile,  $config['permissions'] );
-        }catch (\Exception $e){
-            $result[ 'error' ] = $e->getMessage() ;
-        }
-
-
-
-        $result['tempfile'] = $tempfile;
-        $result['index'] = $index;
-        $result['site'] = $SITE;
-        $result['prefix'] = $prefix;
-        return $result;
-    }
-
-
-
-
-
-
-
-
-// urllist.txt
-//$prefix = ""
-    public static function generate_txt($prefix = "") :array|string {
-        $result = ['ExecuteCommand' =>  "php example_bin/test.php type=txt   (xml|txt|html)",   'error' => '', 'sql' => null,   'tempfile'=> " ", 'index' =>  null,  "time:" => date('Y-m-d H:i:s', time())] ;
-        $config = self::getConfig();//_config();
-        $SITE = $config['site'];// $prefix
-        switch ( $prefix) {
-            case "" :       $SITE = $config['site_list'][0]; break;
-            case "ru_" :     $SITE = $config['site_list'][1]; break;
-            case "en_" :     $SITE = $config['site_list'][2]; break;
-        }
-
-        //Begin stopwatch for statistics
-        $start = microtime(true);
-        try {
-
-
-
-
-
-//Setup file stream
-            $tempfile =   $config['file_dir'] . $prefix . $config['file_txt'];//urllist.txt
-//Default html header makes browsers ignore \n
-            header("Content-Type: text/plain");
-            $file_stream = fopen($tempfile, "w") or die("Error: Could not create temporary file $tempfile" . "\n");
-
-            $map_row = "";
-            $map_row .= "". $SITE .'/' ."\n";
-
-            fwrite($file_stream, $map_row);
-            $map_row = "";
-            $index   = 0;
-            db::setConfig($config);
-            $db = db::getInstance( );
-
-            $url_arr = [];
-            foreach ( $config['scan_url_list'] AS $key => $item ) {
-                $url = rtrim($item['loc'], '*')  ;
-                $url =  $SITE.$url;
-                $page = 1;
-                $res_data = $db::getdata($item ['offset'],$item ['listRows'],$item ['field'], $item ['whereStr'],$item ['tablename'] ,$item ['key']);
-                $result['sql'][] = $db::getSql()  ;
-                $result[ 'error' ] = $db::getMessage();
-                foreach ( $res_data as $v ) {
-                    $index++;
-                    $urls[$index] =    $url.$v[ $item ['key']  ];
-                    $map_row =   $urls[$index]  ."\n";
-
-//                    fwrite($file_stream, $map_row);
-                    $url_arr  [] = ['a' => $file_stream, 'b'=> $map_row ];
-                }
-            }
-
-
-            shuffle($url_arr  ) ;
-            foreach ( $url_arr   as $v ) {
-                fwrite($v['a'],$v['b']);
-            }
-            // Finalize sitemap
-
-            fclose($file_stream);
-            // Apply permissions
-            chmod($tempfile,  $config['permissions'] );
-//        }catch (\Exception $e){
-//            return ['error' => $e->getMessage() ];
-//        }
-//        return [ 'tempfile'=> $tempfile , 'index' => $index,  "time:" => date('Y-m-d H:i:s', time())] ;
-
-        }catch (\Exception $e){
-            $result[ 'error' ] = $e->getMessage() ;
-        }
-
-
-
-        $result['tempfile'] = $tempfile;
-        $result['index'] = $index;
-        $result['site'] = $SITE;
-        $result['prefix'] = $prefix;
-        return $result;
-
-
-    }
-// ------   $res = self::generate_html() ;
-//      $prefix = "";
-public static function generate_html($prefix = "") :array|string
-{
-    $result = ['ExecuteCommand' =>  "php example_bin/test.php type=html   (xml|txt|html)",   'error' => '', 'sql' => null,   'tempfile'=> " ", 'index' =>  null,  "time:" => date('Y-m-d H:i:s', time())] ;
+private static function getAllData(): array {
+    $FILE_INDEX = 0;
+    $result = [];
+    $result ['lastsql'] = [];
+    $result ['FILE_INDEX'] =0;
+    $result ['url_arr'] = [];
+    $result [ 'error' ] = '';
     $config = self::getConfig();//_config();
-    $SITE = $config['site'];// $prefix
-    switch ( $prefix) {
-        case "" :       $SITE = $config['site_list'][0]; break;
-        case "ru_" :     $SITE = $config['site_list'][1]; break;
-        case "en_" :     $SITE = $config['site_list'][2]; break;
+    db::setConfig($config);
+    $db = db::getInstance( );
+    $result[ 'error' ] = $db::getMessage(); 
+    foreach ( $config['scan_url_list'] AS $key => $item ) {
+        echo '|----- ' . $key . ' ----|' . PHP_EOL; // 换行符
+        $url = rtrim($item['loc'], '*')  ;
+        $counts = $db::getcounts($item['whereStr'], $item['tablename']);
+        $result['lastsql'][] = $db::getSql() ;
+        $listRows = 5000;
+        $pageCount =  ceil($counts / $listRows)  ;
+        for ($page = 0; $page < $pageCount; $page++) {
+            $offset = $page * $listRows;
+            $item_data = $db::getdata($offset, $listRows, $item['field'], $item['whereStr'], $item['tablename'], $item['key']);
+            $result['lastsql'][] = $db::getSql() .   ":: /{$page}当前页" .$offset. "/一页多少{$listRows}条，" .       "/总{$pageCount}页" .      "/共{$counts}条记录" ;
+            foreach ($item_data AS $keys => $value) {
+                $FILE_INDEX ++;
+                $priority  =   ( mt_rand(1, 10) / 10);
+                $result ['url_arr'] [ $FILE_INDEX] = ['a' =>  '', 'loc'=> $url  , 'id'=>   $value[ $item ['key'] ]    , 'title_ru'=>"" , 'title_en'=>"" , 'title'=> $value['title'],'times'=> $value['times'],'priority'=> $priority  ];
+                echo '|-----INDEX '.$key .'   ' . $FILE_INDEX.'     ' . 'id:  ' .  $value[ $item ['key'] ].  ' ----|' . PHP_EOL; // 换行符
+            }
+        }
+        $result ['FILE_INDEX'] = $FILE_INDEX;
+        $result[ 'error' ] = $db::getMessage(); 
+        echo '|----- -------'.PHP_EOL;
     }
+    return $result;
+}
 
-    //Begin stopwatch for statistics
+
+//---------  生成所有的数据
+
+
+// urllist.txt  2025-04-10  13:30:32  12610148
+//$prefix = ""
+private static function GenerateAllFiles( ) :array|string {
+    $FILE_MAX_LENGTH = 5000;// 每一个文件的最大长度
+    $FILE_INDEX=0; 
+    $result = ['ExecuteCommand' =>  "php example_bin/test.php type=txt   (xml|txt|html)",   'error' => '', 'lastsql' => null,   'tempfile'=> " ", 'index' =>  null,  "time:" => date('Y-m-d H:i:s', time())] ;
+    $config = self::getConfig();//_config();
     $start = microtime(true);
     try {
-
-
-
-
-
-//Setup file stream
-        $tempfile =   $config['file_dir'] .$prefix . $config['file_html'];//urllist.txt
-//Default html header makes browsers ignore \n
-        header("Content-Type: text/plain");
-        $file_stream = fopen($tempfile, "w") or die("Error: Could not create temporary file $tempfile" . "\n");
-
-        $map_row = "<!doctype html>
-<html lang=\"en\">
-<head>
-<title> Site Map  Page 1 - created with PRO Sitemap Service -  ".$SITE."</title>
-<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\" />
-<meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
-<script type=\"text/javascript\">
-function el_t(el,cl){if(el)el.classList.toggle(cl);}
-window.addEventListener('load', (event) => {
-let alh = document.getElementsByClassName('lhead');
-for (let lh of alh) {
-lh.addEventListener('click', function (event) {
-el_t(this,'collapse');
-el_t(this.nextElementSibling,'hide');
-el_t(this.nextElementSibling.nextElementSibling,'hide');
-});
-}
-});
-
-</script>
-<style type=\"text/css\">
-body {
-background-color: #fff;
-font-family: \"Arial Narrow\", \"Helvetica\", \"Arial\", sans-serif;
-margin: 0;
-}
-
-.hide {
-display: none;
-}
-.collapse {
-text-decoration-style: dashed;
-text-decoration-line: underline;
-}
-#top {
-
-background-color: #b1d1e8;
-font-size: 16px;
-padding-bottom: 40px;
-}
-
-nav {
-font-size: 24px;
-
-margin: 0px 30px 0px;
-border-bottom-left-radius: 6px;
-border-bottom-right-radius: 6px;
-background-color: #f3f3f3;
-color: #666;
-box-shadow: 0 10px 20px -12px rgba(0, 0, 0, 0.42), 0 3px 20px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.2);
-padding: 10px 0;
-text-align: center;
-z-index: 1;
-}
-
-h3 {
-margin: auto;
-padding: 10px;
-max-width: 600px;
-color: #666;
-}
-
-h3 span {
-float: right;
-}
-
-h3 a {
-font-weight: normal;
-display: block;
-}
-
-
-#cont {
-font-size: 18px;
-position: relative;
-border-radius: 6px;
-box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.2);
-
-background: #f3f3f3;
-
-margin: -20px 30px 0px 30px;
-padding: 20px;
-}
-small {
-color: #666;
-}
-
-a:link,
-a:visited {
-color: #0180AF;
-text-decoration: underline;
-}
-
-a:hover {
-color: #666;
-}
-
-
-#footer {
-padding: 10px;
-text-align: center;
-}
-
-ul {
-margin: 0px;
-padding: 0px;
-list-style: none;
-}
-
-ul.ultree {
-border: #ccc 1px solid;
-border-radius: 4px;
-border-bottom: none;
-}
-
-li {
-margin: 0px;
-}
-
-li ul {
-margin-left: 20px;
-}
-
-li.lhead {
-background: #ddd;
-color: #666;
-padding: 5px;
-margin: 0px;
-cursor: pointer;
-}
-li.lhead:hover,
-.pager a:hover
-{
-background: #ccc;
-}
-.lcount {
-padding: 0px 10px;
-}
-
-.lpage {
-/*border-bottom: #ddd 1px solid;*/
-padding: 5px;
-}
-
-.last-page {
-border: none;
-}
-
-.pager {
-text-align: center;
-}
-
-.pager a,
-.pager span {
-padding: 10px;
-margin: 2px;
-background: #fff;
-border-radius: 10px;
-display: inline-block;
-}
-.pager span {
-border: #ccc 1px solid;
-}
-</style>
-</head>
-<body>
-<div id=\"top\">
-<nav>
-". $SITE ." HTML Site Map</nav>
-<h3>
-
-<a href=\"".$SITE ."\">".$SITE." Homepage</a>
-</h3></div>
-<div id=\"cont\">
-<ul class=\"ultree level-1 has-pages\">
-<li class=\"lhead\" title=\"Click to toggle\">".$SITE." </li>
-<li class=\"lpagelist\">
-<ul class=\"ulpages\"> \n";
-        fwrite($file_stream, $map_row);
-        $map_row ="";
-        $index   = 0;
-        db::setConfig($config);
-        $db = db::getInstance($config);
         $url_arr = [];
-        foreach ( $config['scan_url_list'] AS $key => $item ) {
-            $url = rtrim($item['loc'], '*')  ;
-            $url =  $SITE.$url;
-            $page = 1;
-            $res_data = $db::getdata($item ['offset'],$item ['listRows'],$item ['field'], $item ['whereStr'],$item ['tablename'] ,$item ['key']);
-            $result['sql'][] = $db::getSql()  ;
-            $result[ 'error' ] = $db::getMessage();
-            foreach ( $res_data as $v ) {
-                $index++;
-                $urls[$index] =    $url.$v[ $item ['key']  ];
-                $map_row =  "<li class=\"lpage\">  <a href=\"".$urls[$index] ."\" title=\"". $v ['title']."\" >".$urls[$index] ."</a> </li>\n";
-//                fwrite($file_stream, $map_row);
-                $url_arr  [] = ['a' => $file_stream, 'b'=> $map_row ];
+        header("Content-Type: text/plain");
+        $ss = self::getAllData();
+        $url_arr= $ss['url_arr'];
+        $FILE_INDEX = $ss['FILE_INDEX'];
+        $result[ 'error' ] = $ss['error'];
+        $result[ 'lastsql' ] =$ss['lastsql'];
+         //静态的 URLS
+         echo '|----- 静态的 URLS ----|' . PHP_EOL; // 换行符
+         echo '|----- ' . $FILE_INDEX . ' ----|' . PHP_EOL; // 换行符
+         foreach (  $config['static_urls'] AS $key => $item ) {
+             $FILE_INDEX ++;
+             echo '|-----INDEX static_urls ' . $FILE_INDEX . ' ----|' . PHP_EOL; // 换行符
+             $url_arr  [$FILE_INDEX] = ['a' =>  "", 'loc'=> $item['loc'] , 'id'=> $item['id'] ,  'title_ru'=> $item['title_ru']   ,  'title_en'=> $item['title_en']   , 'title'=> $item['title'] ,'times'=>$item['times'] ,'priority'=> $item['priority']   ];
+         }     //静态的 URLS
+        $splitArray = array_chunk($url_arr, $FILE_MAX_LENGTH);
+        // 输出分割后的数组
+        $file_index = 0;
+        $filenames = [];
+        foreach ($splitArray as $v) {
+            if( $file_index > 0){
+                $filenames['txt'] =    'urls-'.$file_index.'.txt';
+                $filenames['xml']  =    'sitemap-'.$file_index.'.xml';
+                $filenames['html']  =    'sitemap-'.$file_index.'.html';
+            }else{
+                $filenames['txt']  =    'urls.txt';
+                $filenames['xml']  =    'sitemap.xml';
+                $filenames['html']  = 'sitemap.html';
             }
+            self::Generatefiles(   $v,  $filenames);//生成文件
+            $file_index ++;
         }
-
-        shuffle($url_arr  ) ;
-        foreach ( $url_arr   as $v ) {
-            fwrite($v['a'],$v['b']);
-        }
-
-
-
-
-
-
-        $map_row =" <li class=\"lhead\" title=\"Click to toggle\">".$SITE."<span class=\"lcount\">".$index."  page</span></li>
-</ul>
-</li>
-</ul>
-</div>
-<div id=\"footer\">
-
-<span>Last updated: " . date("Y-m-d H:i:s" , time())  . "<br />
-Total pages: ".$index."</span>
-
-Page created with ".$SITE." - <a href=\"".$SITE."\"> Sitemap Service</a>
-</div>
-</body>
-</html>";
-
-
-        fwrite($file_stream, $map_row);
-        $map_row =" ";
-
-        // Finalize sitemap
-
-        fclose($file_stream);
-        // Apply permissions
-        chmod($tempfile,  $config['permissions'] );
-//    }catch (\Exception $e){
-//        return ['error' => $e->getMessage() ];
-//    }
-//    return [ 'tempfile'=> $tempfile , 'index' => $index,  "time:" => date('Y-m-d H:i:s', time())] ;
-
     }catch (\Exception $e){
         $result[ 'error' ] = $e->getMessage() ;
     }
+    $result['FILE_INDEX'] = $FILE_INDEX;
+    // 
+    foreach($config['site_list'] AS $site_key => $site_value) { //prefix  domain
+        $index_xml =  $config['file_dir'].$site_value['prefix']. 'sitemap_index.xml';
+        $index_xml_stream = fopen(    $index_xml, "w") or die("Error: Could not create temporary file ".    $index_xml." \n");
+        $index_xml_sitemap = new SitemapIndex( $index_xml);//__DIR__ . '/sitemap.xml');
+        $len = ceil($FILE_INDEX / $FILE_MAX_LENGTH); // Calculate the number of files needed
+        for ($i = 0; $i < $len; $i++) {
+            $times = time();
+            $router_url = 'sitemap.xml';
+            if(  $i > 0){
+                $router_url = 'sitemap-'.$i.'.xml';
+            }
+            $index_xml_sitemap->addSitemap( $site_value['domain'].$router_url,  $times, null, null);
+        }
+        $index_xml_sitemap->write();
+        chmod($index_xml ,  $config['permissions'] );
+        unset($index_xml_stream);
+    }
 
 
 
-    $result['tempfile'] = $tempfile;
-    $result['index'] = $index;
-    $result['site'] = $SITE;
-    $result['prefix'] = $prefix;
+    $sourceDir = rtrim($config['file_dir'], '/') . '/';
+    $targetDir = rtrim($config["target_directory"], '/') . '/';
+
+    if (!is_dir($sourceDir)) {
+        throw new \Exception("Source directory does not exist: " . $sourceDir);
+    }
+
+    if (!is_dir($targetDir)) {
+        if (!mkdir($targetDir, 0755, true)) {
+            throw new \Exception("Failed to create target directory: " . $targetDir);
+        }
+    }
+
+    $files = glob($sourceDir . '*');
+    foreach ($files as $file) {
+        //  忽略 .gitignore文件 不复制
+        if (basename($file) == '.gitignore') {
+            continue;
+        }
+        if (is_file($file)) {
+            $destination = $targetDir . basename($file);
+            chmod( $destination ,  $config['permissions'] );
+            echo "Copying .. to $destination\n";
+            if (!copy($file, $destination)) {
+                throw new \Exception("Failed to copy file: " . $file . " to " . $destination);
+            }
+        }
+    }
+
     return $result;
-
 }
 
 
+
+//------------ 生成今天的数据
+
+ 
+
+
+
+
+
+/**
+ * 
+ * 
+ * 
+ * 生成文件
+ * 
+ * 
+ * */ 
+private static function Generatefiles($datas,$filenames): array  {
+    $result = ['error' => 0, 'tempfile'=> $filenames , 'index' => count($datas),  "time:" => date('Y-m-d H:i:s', time())] ;
+    try {
+        $config = self::getConfig(); 
+        foreach($config['site_list'] AS $key => $value) { //prefix  domain
+            foreach ($filenames as $filename_k => $filename_v) {
+                $file[$filename_k] = $config['file_dir'].$value['prefix'].$filename_v;
+                $file_stream = fopen($file[$filename_k], "w") or die("Error: Could not create temporary file ".$file[$filename_k]." \n");
+                if ($filename_k == 'txt') {
+                    foreach ($datas as $k => $v) { 
+                        $router_url = $v['loc'].$v['id'];
+                        if($v['id'] == 0 ){
+                            $router_url = $v['loc'];
+                        } 
+                        fwrite( $file_stream, $value['domain'].$router_url.PHP_EOL );
+                    }
+                    // end 
+                }else if ($filename_k == 'xml') {
+           
+                        $sitemap = new Sitemap($file[$filename_k]);//__DIR__ . '/sitemap.xml');
+                        foreach ($datas as $k => $v) { 
+                            $router_url = $v['loc'].$v['id'];
+                            if($v['id'] == 0 ){
+                                $router_url = $v['loc'];
+                            } 
+                            $update_week = rand(1, 10) / 10.0;
+                            $times = strtotime($v['times']);
+                            $sitemap->addItem( $value['domain'].$router_url,  $times, Sitemap::DAILY, $update_week );
+                        }
+                        $sitemap->write();
+                        unset($sitemap);
+                    // end
+                }else if ($filename_k == 'html') {
+                    $sitemap = new SitemapHtml($file[$filename_k]);//__DIR__ . '/sitemap.xml');
+                    // addItem
+                    foreach ($datas as $k => $v) { 
+                        $router_url = $v['loc'].$v['id'];
+                        if($v['id'] == 0 ){
+                            $router_url = $v['loc'];
+                        } 
+                        $update_week = rand(1, 10) / 10.0;
+                        // $times = strtotime($v['times']);
+                        $sitemap->addItem( $value['domain'].$router_url,  $v['title']);
+                    }
+                    $sitemap->write();
+                    unset($sitemap);
+
+                    // end
+                }else{
+                    // end
+                }  
+                fclose($file_stream);
+                chmod($file[$filename_k],  $config['permissions'] );
+                unset($file_stream);
+
+            }
+        }
+    }catch (\Exception $e){
+        $result ['error']=  $e->getMessage() ;
+    }
+    return  $result;
+}
+//-----------------  
+
+  
 //------
 }

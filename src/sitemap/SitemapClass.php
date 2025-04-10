@@ -146,9 +146,9 @@ private static function GenerateAllFiles( ) :array|string {
         $len = ceil($FILE_INDEX / $FILE_MAX_LENGTH); // Calculate the number of files needed
         for ($i = 0; $i < $len; $i++) {
             $times = time();
-            $router_url = 'sitemap.xml';
+            $router_url = '/sitemap.xml';
             if(  $i > 0){
-                $router_url = 'sitemap-'.$i.'.xml';
+                $router_url = '/sitemap-'.$i.'.xml';
             }
             $index_xml_sitemap->addSitemap( $site_value['domain'].$router_url,  $times, null, null);
         }

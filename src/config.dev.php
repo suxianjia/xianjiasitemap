@@ -18,10 +18,10 @@ return array(
     'lastmod' =>  date('Y-m-d H:i:s', time()) , //lastmod：页面最后修改时间
 
 /*
-r 数据库   :  www_u_petrol_com
-read 账号        :  	  r_api_user_readonly
-read pwd				 :  Rdbfd_tdh@8readonly80Db
-link						 :   readonly-0859y717cv0-clusterd93.mysql.rds.aliyuncs.com（端口：3309）
+r 数据库   :   ***** 
+read 账号        :  	   ***** 
+read pwd				 :   ***** @ ***** 
+link						 :    ***** - ***** - ***** .mysql.rds. ***** .com（端口：3309）
 port 						 :     3309
 */
 //data

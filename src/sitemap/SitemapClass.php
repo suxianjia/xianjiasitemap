@@ -69,7 +69,7 @@ private static function getAllData(): array {
         $url = rtrim($item['loc'], '*')  ;
         $counts = $db::getcounts($item['whereStr'], $item['tablename']);
         $result['lastsql'][] = $db::getSql() ;
-        $listRows = 5000;
+        $listRows = 2000; // {"error":400,"message":"only 2000 urls are allowed once"} \n
         $pageCount =  ceil($counts / $listRows)  ;
         for ($page = 0; $page < $pageCount; $page++) {
             $offset = $page * $listRows;
@@ -96,7 +96,7 @@ private static function getAllData(): array {
 // urllist.txt  2025-04-10  13:30:32  12610148
 //$prefix = ""
 private static function GenerateAllFiles( ) :array|string {
-    $FILE_MAX_LENGTH = 5000;// 每一个文件的最大长度
+    $FILE_MAX_LENGTH = 2000;// 每一个文件的最大长度 {"error":400,"message":"only 2000 urls are allowed once"} \n
     $FILE_INDEX=0; 
     $result = ['ExecuteCommand' =>  "php example_bin/test.php type=txt   (xml|txt|html)",   'error' => '', 'lastsql' => null,   'tempfile'=> " ", 'index' =>  null,  "time:" => date('Y-m-d H:i:s', time())] ;
     $config = self::getConfig();//_config();

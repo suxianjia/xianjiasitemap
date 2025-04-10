@@ -45,11 +45,12 @@ class SitemapHtml
 
 	private function generateHtml(): string
 	{
-		$html = "<!DOCTYPE html>\n<html>\n<head>\n<title>Sitemap</title>\n</head>\n<body>\n";
+		header("Content-Type: text/html; charset=UTF-8");
+		$html = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\">\n<title>Sitemap</title>\n</head>\n<body>\n";
 		$html .= "<h1>Sitemap</h1>\n<ul>\n";
 
 		foreach ($this->items as $item) {
-			$html .= "<li> <a href=\"{$item['location']}\" title= \"{$item['title']}\"	>{$item['title']}</a> </li>\n";
+			$html .= "<li> <a href=\"{$item['location']}\" title=\"{$item['title']}\">{$item['title']}</a> </li>\n";
 		}
 
 		$html .= "</ul>\n</body>\n</html>";

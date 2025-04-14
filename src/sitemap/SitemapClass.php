@@ -235,7 +235,15 @@ private static function Generatefiles($datas,$filenames): array  {
                                 $router_url = $v['loc'];
                             } 
                             $update_week = rand(1, 10) / 10.0;
-                            $times = strtotime($v['times']);
+                            // 判断时间格式 是时间戳 还是 时间字符串
+
+                            if (is_numeric($v['times'])) {
+                                    $times = (int)$v['times'];
+                            } elseif (strtotime($v['times']) !== false) {
+                                    $times = strtotime($v['times']);
+                            } else {
+                                    $times = time(); // Default to current time if format is invalid
+                            }
                             $sitemap->addItem( $value['domain'].$router_url,  $times, Sitemap::DAILY, $update_week );
                         }
                         $sitemap->write();

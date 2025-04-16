@@ -76,7 +76,7 @@ Total 1 (delta 0), reused 0 (delta 0), pack-reused 0
 To github.com:suxianjia/xianjiasitemap.git
  * [new tag]         v1.1.7 -> v1.1.7
 yx-dev@Mac xianjiasitemap % 
-
+git tag -a v1.1.8 -m " Replace \{\{id\}\} with $id" 
 
 https://packagist.org/packages/submit
 https://packagist.org/packages/suxianjia/xianjiasitemap

@@ -68,13 +68,13 @@ private static function getAllData(): array {
         echo '|----- ' . $key . ' ----|' . PHP_EOL; // 换行符
         // $url = rtrim($item['loc'], '*')  ;
         // $url =  $item['loc']   ;
-        $counts = $db::getcounts($item['whereStr'], $item['tablename']);
+        $counts = $db::getcounts($item['joinStr'], $item['whereStr'], $item['tablename']);
         $result['lastsql'][] = $db::getSql() ;
         $listRows = 2000; // {"error":400,"message":"only 2000 urls are allowed once"} \n
         $pageCount =  ceil($counts / $listRows)  ;
         for ($page = 0; $page < $pageCount; $page++) {
-            $offset = $page * $listRows;
-            $item_data = $db::getdata($offset, $listRows, $item['field'], $item['whereStr'], $item['tablename'], $item['key']);
+            $offset = $page * $listRows;// joinStr
+            $item_data = $db::getdata($offset, $listRows, $item['field'], $item['joinStr'], $item['whereStr'], $item['tablename'], $item['key']);
             $result['lastsql'][] = $db::getSql() .   ":: /{$page}当前页" .$offset. "/一页多少{$listRows}条，" .       "/总{$pageCount}页" .      "/共{$counts}条记录" ;
             foreach ($item_data AS $keys => $value) {
                 $FILE_INDEX ++;

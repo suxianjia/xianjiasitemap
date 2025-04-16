@@ -66,7 +66,8 @@ private static function getAllData(): array {
     $result[ 'error' ] = $db::getMessage(); 
     foreach ( $config['scan_url_list'] AS $key => $item ) {
         echo '|----- ' . $key . ' ----|' . PHP_EOL; // 换行符
-        $url = rtrim($item['loc'], '*')  ;
+        // $url = rtrim($item['loc'], '*')  ;
+        // $url =  $item['loc']   ;
         $counts = $db::getcounts($item['whereStr'], $item['tablename']);
         $result['lastsql'][] = $db::getSql() ;
         $listRows = 2000; // {"error":400,"message":"only 2000 urls are allowed once"} \n
@@ -78,7 +79,9 @@ private static function getAllData(): array {
             foreach ($item_data AS $keys => $value) {
                 $FILE_INDEX ++;
                 $priority  =   ( mt_rand(1, 10) / 10);
-                $result ['url_arr'] [ $FILE_INDEX] = ['a' =>  '', 'loc'=> $url  , 'id'=>   $value[ $item ['key'] ]    , 'title_ru'=>"" , 'title_en'=>"" , 'title'=> $value['title'],'times'=> $value['times'],'priority'=> $priority  ];
+                $id =  $value[ $item ['key'] ];
+                $url = str_replace('{{id}}', $id, $item['loc']); // Replace {{id}} with $id
+                $result ['url_arr'] [ $FILE_INDEX] = ['a' =>  '', 'loc'=> $url  , 'id'=>  $id , 'title_ru'=>"" , 'title_en'=>"" , 'title'=> $value['title'],'times'=> $value['times'],'priority'=> $priority  ];
                 echo '|-----INDEX '.$key .'   ' . $FILE_INDEX.'     ' . 'id:  ' .  $value[ $item ['key'] ].  ' ----|' . PHP_EOL; // 换行符
             }
         }
@@ -219,10 +222,10 @@ private static function Generatefiles($datas,$filenames): array  {
                 $file_stream = fopen($file[$filename_k], "w") or die("Error: Could not create temporary file ".$file[$filename_k]." \n");
                 if ($filename_k == 'txt') {
                     foreach ($datas as $k => $v) { 
-                        $router_url = $v['loc'].$v['id'];
-                        if($v['id'] == 0 ){
+                        // $router_url = $v['loc'].$v['id'];
+                        // if($v['id'] == 0 ){
                             $router_url = $v['loc'];
-                        } 
+                        // } 
                         fwrite( $file_stream, $value['domain'].$router_url.PHP_EOL );
                     }
                     // end 
@@ -230,10 +233,10 @@ private static function Generatefiles($datas,$filenames): array  {
            
                         $sitemap = new Sitemap($file[$filename_k]);//__DIR__ . '/sitemap.xml');
                         foreach ($datas as $k => $v) { 
-                            $router_url = $v['loc'].$v['id'];
-                            if($v['id'] == 0 ){
+                            // $router_url = $v['loc'].$v['id'];
+                            // if($v['id'] == 0 ){
                                 $router_url = $v['loc'];
-                            } 
+                            // } 
                             $update_week = rand(1, 10) / 10.0;
                             // 判断时间格式 是时间戳 还是 时间字符串
 
@@ -253,10 +256,10 @@ private static function Generatefiles($datas,$filenames): array  {
                     $sitemap = new SitemapHtml($file[$filename_k]);//__DIR__ . '/sitemap.xml');
                     // addItem
                     foreach ($datas as $k => $v) { 
-                        $router_url = $v['loc'].$v['id'];
-                        if($v['id'] == 0 ){
-                            $router_url = $v['loc'];
-                        } 
+                        // $router_url = $v['loc'].$v['id'];
+                        // if($v['id'] == 0 ){
+                             $router_url = $v['loc'];
+                        // } 
                         $update_week = rand(1, 10) / 10.0;
                         // $times = strtotime($v['times']);
                         $sitemap->addItem( $value['domain'].$router_url,  $v['title']);

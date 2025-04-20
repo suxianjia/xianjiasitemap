@@ -2,4 +2,4 @@
 !.gitignore
 public_html
 example_bin/config.php
-
+runtime/*

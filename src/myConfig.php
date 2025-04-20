@@ -1,5 +1,5 @@
 <?php 
-namespace Suxianjia\xianjiaocr;
+namespace Suxianjia\Xianjiasitemap;
 use Exception;
 
 
@@ -9,7 +9,7 @@ class myConfig {
     private $config = [];
 
     private function __construct() {
-        $configFile = __DIR__ . '/config.php';
+        $configFile = __DIR__ . '/config/config.php';
         if (!file_exists($configFile)) {
             throw new Exception('Configuration file not found: ' . $configFile);
         }
@@ -19,7 +19,7 @@ class myConfig {
         if (!is_writable($configFile)) {
             throw new Exception('Configuration file is not writable: ' . $configFile);
         }
-        $this->config = require_once __DIR__ . '/config.php';
+        $this->config = require_once __DIR__ . '/config/config.php';
 
  
 
@@ -47,7 +47,7 @@ class myConfig {
     public function save() {
         try {
             // $this->writeConfigToFile();
-            $configFile = __DIR__ . '/config.php';
+            $configFile = __DIR__ . '/config/config.php';
             $configContent = "<?php\n\nreturn " . var_export($this->config, true) . ";\n";
             file_put_contents($configFile, $configContent);
         } catch (Exception $e) {
@@ -56,7 +56,7 @@ class myConfig {
 
     }
     public function reload() {
-        $this->config = require_once __DIR__ . '/config.php';
+        $this->config = require_once __DIR__ . '/config/config.php';
     }
     public function getDatabaseConfig() {
         return $this->config['db'] ?? [];

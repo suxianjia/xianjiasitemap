@@ -46,11 +46,15 @@ class myApp {
     public function run_sitemap(array  $args = []): array|string
     {
         $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
-        // $this_config = require __DIR__ . '/config.php';
-$app = SitemapClass::getInstance();
-$app::setArgs($args);
-        // SitemapClass::setConfig( $this_config );
-        $results['data']['results'] =  $app::generate();
+ 
+        $app = SitemapClass::getInstance();
+        $app::setArgs($args);
+        $res = $app::generate();
+        if ($res['code'] == 200) {
+            $results['code'] = 200;
+            $results['msg'] = 'Success';
+        }
+        $results['data']  =   $res['data'];
         return $results;
     }
 

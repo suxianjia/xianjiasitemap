@@ -45,7 +45,7 @@ class SitemapHtml
 
 	private function generateHtml(): string
 	{
-		header("Content-Type: text/html; charset=UTF-8");
+		// header("Content-Type: text/html; charset=UTF-8");
 		$html = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\">\n<title>Sitemap</title>\n</head>\n<body>\n";
 		$html .= "<h1>Sitemap</h1>\n<ul>\n";
 

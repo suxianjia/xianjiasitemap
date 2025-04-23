@@ -102,8 +102,8 @@ private static function getAllData(): array {
         echo '|----- foreach ' . $key . ' ----|' . PHP_EOL; // 换行符
         // $url = rtrim($item['loc'], '*')  ;
         // $url =  $item['loc']   ;
-    
-        $counts = myDatabase::getInstance()->getCounts($item['tablename'],$item['whereStr'],$item['joinStr'] );
+        $joinStr = isset($item['joinStr']) ? $item['joinStr'] : '';
+        $counts = myDatabase::getInstance()->getCounts($item['tablename'],$item['whereStr'], $joinStr  );
         $results['data']['lastsql'][] = myDatabase::getInstance()::getLastSql() ;
         if ( $counts['code'] != 200 && $counts['data']['count'] ==  0 ) {
             // 跳过 foreach 
@@ -119,8 +119,8 @@ private static function getAllData(): array {
         $pageCount =  ceil( $counts['data']['count']   / $listRows)  ;
         for ($page = 0; $page < $pageCount; $page++) {
             $offset = $page * $listRows;// joinStr
- 
-            $item_data =  myDatabase::getInstance()->getdata($offset, $listRows, $item['field'], $item['joinStr'], $item['whereStr'], $item['tablename'], $item['key']);
+            $joinStr = isset($item['joinStr']) ? $item['joinStr'] : '';
+            $item_data =  myDatabase::getInstance()->getdata($offset, $listRows, $item['field'],  $joinStr, $item['whereStr'], $item['tablename'], $item['key']);
             $results['data']['lastsql'][] = myDatabase::getInstance()::getLastSql() ;
             if ( $item_data['code'] != 200 ) {
                 echo '|----- 跳过 for page' . $page . ' ----|' . PHP_EOL; // 换行符

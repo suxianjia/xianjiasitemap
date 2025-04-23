@@ -11,13 +11,15 @@
 
     "authors": [
         {
-            "name": "dev",
+            "name": "xianjia",
             "email": "605011288@qq.com"
         }
     ],
     "require": {
         "php": "^8.0|>=8.3.3",
       "ext-pdo": "*",
-      "ext-xmlwriter": "*"
+      "ext-xmlwriter": "*",
+        "suxianjia/xianjiaorm": "^2.0",
+        "suxianjia/xianjialogwriter": "^1.0"
     }
 }

@@ -9,11 +9,21 @@ class ComposerStaticInit8e68499b834246012cdfdd9f5bc90bd8
     public static $prefixLengthsPsr4 = array (
         'S' => 
         array (
+            'Suxianjia\\xianjiaorm\\' => 21,
+            'Suxianjia\\xianjialogwriter\\' => 27,
             'Suxianjia\\Xianjiasitemap\\' => 25,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
+        'Suxianjia\\xianjiaorm\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/suxianjia/xianjiaorm/src',
+        ),
+        'Suxianjia\\xianjialogwriter\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/suxianjia/xianjialogwriter/src',
+        ),
         'Suxianjia\\Xianjiasitemap\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src',

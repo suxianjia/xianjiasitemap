@@ -6,5 +6,7 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Suxianjia\\xianjiaorm\\' => array($vendorDir . '/suxianjia/xianjiaorm/src'),
+    'Suxianjia\\xianjialogwriter\\' => array($vendorDir . '/suxianjia/xianjialogwriter/src'),
     'Suxianjia\\Xianjiasitemap\\' => array($baseDir . '/src'),
 );

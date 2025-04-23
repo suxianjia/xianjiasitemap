@@ -1,5 +1,4 @@
 <?php 
-<<<<<<< HEAD
 namespace Suxianjia\xianjiaorm;
 use Suxianjia\xianjiaorm\myConfig;
 use Exception;
@@ -21,43 +20,20 @@ class myApp {
 
     private static $instance = null;
     private static $runtime_path = '';
-=======
-namespace Suxianjia\Xianjiasitemap;
-use Suxianjia\Xianjiasitemap\myConfig;
-use Exception;
-use Suxianjia\xianjiaocr\client\OCRClient;
-use Suxianjia\xianjiaocr\orm\myDatabase;
-use Suxianjia\xianjiaocr\client\myLogClient;
-
-
-class myApp {
-    
-
-    private static $instance = null;
->>>>>>> 19df9dcedbc8c3dbda73d22ecebbb50d07e3ce6c
  
 
     private function __construct() {
         // Private constructor to prevent direct instantiation
     }
-<<<<<<< HEAD
 //     public static function getInstance(string $tableName, string $contentName, string $idName): Appocr {
     public static function getInstance(): myApp { 
         if (self::$instance === null) {
             self::init();
-=======
- 
-    public static function getInstance(): myApp { 
- 
-
-        if (self::$instance === null) {
->>>>>>> 19df9dcedbc8c3dbda73d22ecebbb50d07e3ce6c
             self::$instance = new self();
         }
         return self::$instance;
     }
 
-<<<<<<< HEAD
     private static function init () {
  
     }
@@ -121,7 +97,4 @@ public static function getRuntimePath(): string {
 }
  
   
-=======
- 
->>>>>>> 19df9dcedbc8c3dbda73d22ecebbb50d07e3ce6c
 }

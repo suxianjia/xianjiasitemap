@@ -84,5 +84,5 @@ https://packagist.org/packages/suxianjia/xianjiasitemap
 https://github.com/suxianjia/xianjiasitemap/releases/new
 
 php82 composer-php82.phar update
-
+php82 composer82.phar update
 ```

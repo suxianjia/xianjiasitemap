@@ -141,7 +141,7 @@ private static function getAllData(): array {
             $offset = $page * self::getListRows() ;// joinStr
             $joinStr = isset($item['joinStr']) ? $item['joinStr'] : '';
             $item_data =  myDatabase::getInstance()->getdata($offset, self::getListRows() , $item['field'],  $joinStr, $item['whereStr'], $item['tablename'], $item['key']);
-            $results['data']['lastsql'][$key]['lists'] == myDatabase::getInstance()::getLastSql() ;
+            $results['data']['lastsql'][$key]['lists'] = myDatabase::getInstance()::getLastSql() ;
             if ( $item_data['code'] != 200 ) {
                 echo '|----- 跳过 for page' . $page . ' ----|' . PHP_EOL; // 换行符
                 $results ['data']['error_arr'][] =   myDatabase::getInstance()::getLastError();   //$db::getMessage(); 

@@ -3,7 +3,7 @@ namespace Suxianjia\xianjiasitemap;
 use Suxianjia\xianjiasitemap\myConfig;
 use Exception;
 use Suxianjia\xianjiaorm\orm\myDatabase;
-use Suxianjia\Xianjiasitemap\sitemap\SitemapClass;
+use Suxianjia\xianjiasitemap\sitemap\SitemapClass;
 use Suxianjia\xianjialogwriter\client\myLogClient;
 if (!defined('myAPP_VERSION')) {        exit('myAPP_VERSION is not defined'); }
 if (!defined('myAPP_ENV')  ) {          exit ('myAPP_ENV is not defined'); }

@@ -2,7 +2,8 @@
 
 namespace Suxianjia\xianjiasitemap\sitemap;
 
-use Suxianjia\xianjiasitemap\orm\pdo as db;
+use Suxianjia\xianjiaorm\orm\myPdo  as db;
+use Suxianjia\xianjiaorm\orm\myDatabase;
 
 use Suxianjia\xianjiasitemap\client\Sitemap;
 use Suxianjia\xianjiasitemap\client\SitemapIndex;
@@ -56,6 +57,7 @@ class SitemapClass
     {
         // self::$config = ConfigClass::getInstance()::setConfig($array)::getConfig();
         self::$config = myConfig::getInstance()::getSitemapConfig();
+        // var_dump(   self::$config  ); exit;
 
     }
 
@@ -89,7 +91,7 @@ private static function getAllData(): array {
     $result ['url_arr'] = [];
     $result [ 'error' ] = '';
     $config = self::getConfig();//_config();
-    db::setConfig($config);
+    // db::setConfig($config);
     $db = db::getInstance( );
     $result[ 'error' ] = $db::getMessage(); 
     foreach ( $config['scan_url_list'] AS $key => $item ) {

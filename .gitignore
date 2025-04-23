@@ -3,3 +3,4 @@ vendor
 runtime/*
 public_html
 example_bin/config.php
+composer.lock

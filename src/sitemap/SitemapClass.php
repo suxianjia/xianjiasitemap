@@ -90,7 +90,7 @@ class SitemapClass
 
 private static function getAllData(): array {
     $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
-    $file_index = 0;
+ 
  
     $results ['data']['lastsql'] = [];
     $results ['data']['file_index'] =0;
@@ -108,6 +108,7 @@ private static function getAllData(): array {
         if ( $counts['code'] != 200 && $counts['data']['count'] ==  0 ) {
             // 跳过 foreach 
             echo '|----- 跳过 foreach ' . $key . ' ----|' . PHP_EOL; // 换行符
+            $results ['data']['error_arr'][] =   myDatabase::getInstance()::getLastError();   //$db::getMessage(); 
             continue;
         }
     
@@ -123,24 +124,26 @@ private static function getAllData(): array {
             $results['data']['lastsql'][] = myDatabase::getInstance()::getLastSql() ;
             if ( $item_data['code'] != 200 ) {
                 echo '|----- 跳过 for page' . $page . ' ----|' . PHP_EOL; // 换行符
+                $results ['data']['error_arr'][] =   myDatabase::getInstance()::getLastError();   //$db::getMessage(); 
             }
  
      
             echo     "|----- for page:: /{$page}当前页" .$offset. "/一页多少{$listRows}条，" .       "/总{$pageCount}页" .      "/共 ".$counts['data']['count'] ."条记录" ;
             foreach (  $item_data['data']   AS $keys => $value) {
-                $file_index ++;
+                $results ['data']['file_index'] = $results ['data']['file_index']  + 1;
                 $priority  =   ( mt_rand(1, 10) / 10);
                 $id =  $value[ $item ['key'] ];
                 $url = str_replace('{{id}}', $id, $item['loc']); // Replace {{id}} with $id
                 $q = ['a' =>  '', 'loc'=> $url  , 'id'=>  $id , 'title_ru'=>"" , 'title_en'=>"" , 'title'=> $value['title'],'times'=> $value['times'],'priority'=> $priority  ];
                 echo "|-----item: ".json_encode( $q, JSON_UNESCAPED_UNICODE) .  ' ----|' . PHP_EOL; // 换行符  ).'--|'.PHP_EOL;
-                echo '|-----INDEX: '.$key .'   ' . $file_index.'     ' . 'id:  ' .  $value[ $item ['key'] ].  ' ----|' . PHP_EOL; // 换行符
+                echo '|-----INDEX: '.$key .' ,  file_index:' . $results ['data']['file_index'] .'     ' . 'id:  ' .  $value[ $item ['key'] ].  ' ----|' . PHP_EOL; // 换行符
             }
         }
-        $results ['data']['file_index'] = $file_index;
-        $results ['data']['error_arr'][] =   myDatabase::getInstance()::getLastError();   //$db::getMessage(); 
+  
+ 
         echo '|----- -------'.PHP_EOL;
     }
+ 
     return $results;
 }
 
@@ -152,9 +155,9 @@ private static function getAllData(): array {
 //$prefix = ""
 private static function GenerateAllFiles( int $FILE_MAX_LENGTH = 2000 ) :array|string {
     $results = ['code' => 500, 'msg' => 'Failed', 'data' => [],'ExecuteCommand' =>  "php  test.php type=txt   (xml|txt|html)",   'error' => '', 'lastsql' => null,   'tempfile'=> " ", 'index' =>  null,  "time:" => date('Y-m-d H:i:s', time())] ;
-
+    $results ['data']['generate_file_index'] =0;
     // $FILE_MAX_LENGTH = 2000;// 每一个文件的最大长度 {"error":400,"message":"only 2000 urls are allowed once"} \n
-    $file_index=0; 
+ 
 
     $config = self::getConfig();//_config();
     $start = microtime(true);
@@ -162,44 +165,47 @@ private static function GenerateAllFiles( int $FILE_MAX_LENGTH = 2000 ) :array|s
         $url_arr = [];
         header("Content-Type: text/plain");
         $ss = self::getAllData();
+        $results ['data']['error_arr']         = $ss['data']['error_arr'];
  
-        $results ['data']['url_arr']      = $url_arr        = $ss['data']['url_arr'];
-        $results  ['data']['file_index']   = $file_index     = $ss['data']['file_index'];
+        $results  ['data']['file_index']     = $ss['data']['file_index'];
          //静态的 URLS
          echo '|----- 静态的 URLS ----|' . PHP_EOL; // 换行符
-         echo '|----- ' . $file_index . ' ----|' . PHP_EOL; // 换行符
+         echo '|----- ' . $results ['data']['generate_file_index'] . ' ----|' . PHP_EOL; // 换行符
          foreach (  $config['static_urls'] AS $key => $item ) {
-             $file_index ++;
-             echo '|-----INDEX static_urls ' . $file_index . ' ----|' . PHP_EOL; // 换行符
-             $url_arr [$file_index] = ['a' =>  "", 'loc'=> $item['loc'] , 'id'=> $item['id'] ,  'title_ru'=> $item['title_ru']   ,  'title_en'=> $item['title_en']   , 'title'=> $item['title'] ,'times'=>$item['times'] ,'priority'=> $item['priority']   ];
+            $results ['data']['generate_file_index'] ++;
+             echo '|-----INDEX static_urls ' . $results ['data']['generate_file_index'] . ' ----|' . PHP_EOL; // 换行符
+             $url_arr [ ] = ['a' =>  "", 'loc'=> $item['loc'] , 'id'=> $item['id'] ,  'title_ru'=> $item['title_ru']   ,  'title_en'=> $item['title_en']   , 'title'=> $item['title'] ,'times'=>$item['times'] ,'priority'=> $item['priority']   ];
          }     //静态的 URLS
         $splitArray = array_chunk($url_arr, $FILE_MAX_LENGTH);
         // 输出分割后的数组
-        $file_index = 0;
+        $split_file_index = 0;
         $filenames = [];
         foreach ($splitArray as $v) {
-            if( $file_index > 0){
-                $filenames['txt'] =    'urls-'.$file_index.'.txt';
-                $filenames['xml']  =    'sitemap-'.$file_index.'.xml';
-                $filenames['html']  =    'sitemap-'.$file_index.'.html';
+            if( $split_file_index > 0){
+                $filenames['txt'] =    'urls-'.$split_file_index.'.txt';
+                $filenames['xml']  =    'sitemap-'.$split_file_index.'.xml';
+                $filenames['html']  =    'sitemap-'.$split_file_index.'.html';
             }else{
                 $filenames['txt']  =    'urls.txt';
                 $filenames['xml']  =    'sitemap.xml';
                 $filenames['html']  = 'sitemap.html';
             }
             self::Generatefiles(   $v,  $filenames);//生成文件
-            $file_index ++;
+            $split_file_index ++;
         }
 
 
+        
         $results[ 'code' ] = 200;
         $results[ 'msg' ] = 'success';
     }catch (\Exception $e){
-        $results['data'][ 'error' ] = $e->getMessage() ;
+        $results ['data']['error_arr']  = $e->getMessage() ;
+        return $results;
     }
-    $results['data']['file_index'] = $file_index;
+ 
     // 
     foreach($config['site_list'] AS $site_key => $site_value) { //prefix  domain
+        
         // $config['file_dir']
         if ( !is_dir( $config['file_dir']  ) ){
             mkdir( $config['file_dir'], 0777 , true );
@@ -213,7 +219,7 @@ private static function GenerateAllFiles( int $FILE_MAX_LENGTH = 2000 ) :array|s
         $index_xml =  $config['file_dir'].'/'.$site_value['prefix']. 'sitemap_index.xml';
         $index_xml_stream = fopen(    $index_xml, "w") or die("Error: Could not create temporary file ".    $index_xml." \n");
         $index_xml_sitemap = new SitemapIndex( $index_xml);//__DIR__ . '/sitemap.xml');
-        $len = ceil($file_index / $FILE_MAX_LENGTH); // Calculate the number of files needed
+        $len = ceil( $split_file_index  / $FILE_MAX_LENGTH); // Calculate the number of files needed
         for ($i = 0; $i < $len; $i++) {
             $times = time();
             $router_url = '/sitemap.xml';
@@ -243,6 +249,7 @@ private static function GenerateAllFiles( int $FILE_MAX_LENGTH = 2000 ) :array|s
     }
 
     $files = glob($sourceDir . '*');
+    $CopyingFiles = 0;
     foreach ($files as $file) {
         //  忽略 .gitignore文件 不复制
         if (basename($file) == '.gitignore') {
@@ -250,8 +257,8 @@ private static function GenerateAllFiles( int $FILE_MAX_LENGTH = 2000 ) :array|s
         }
         if (is_file($file)) {
             $destination_file = $targetDir . basename($file);
-
-            echo "Copying ".basename($file)." to $destination_file --- ".PHP_EOL;
+            $CopyingFiles ++;
+            echo "|--CopyingFiles : ".$CopyingFiles. ",  Copying ".basename($file)." to $destination_file --- ".PHP_EOL;
             if (!copy($file, $destination_file)) {
                 throw new \Exception("Failed to copy file: " . $file . " to " . $destination_file);
             }else{
@@ -259,7 +266,8 @@ private static function GenerateAllFiles( int $FILE_MAX_LENGTH = 2000 ) :array|s
             }
         }
     }
-
+    $results  ['data']['CopyingFiles']  =    $CopyingFiles;
+    $results  ['data']['split_file_index']     = $split_file_index;
     return $results;
 }
 
@@ -347,7 +355,7 @@ private static function Generatefiles($datas,$filenames): array  {
             }
         }
     }catch (\Exception $e){
-        $result ['error']=  $e->getMessage() ;
+        $results ['data']['error_arr'] =  $e->getMessage() ;
     }
     return  $result;
 }

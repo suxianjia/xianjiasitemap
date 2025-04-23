@@ -1,11 +1,11 @@
 <?php
 
 namespace Suxianjia\Xianjiasitemap\orm;
-
+use PDO;
 use PDOException;
 //use function typeof;
 
-class pdo
+class myPdo
 {
 
     private static string $error = '';
@@ -14,12 +14,12 @@ class pdo
 
     private static array $config;
 
-    private static pdo $instance;
+    private static myPdo $instance;
     private static string $sql = '';
 
     private function __construct()    {    }
     private function __clone()    {    }
-    public static function getInstance(): pdo
+    public static function getInstance(): myPdo
     {
 
         if(!isset(self::$instance)){

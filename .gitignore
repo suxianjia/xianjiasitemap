@@ -3,4 +3,4 @@
 public_html
 example_bin/config.php
 vendor
-
+runtime/*

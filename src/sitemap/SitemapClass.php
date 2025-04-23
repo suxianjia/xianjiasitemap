@@ -21,7 +21,8 @@ class SitemapClass
 
     private static $args;
     private static $instance;
-
+    private static  int $file_max_length = 2000; //    // $file_max_length = 2000;// 每一个文件的最大长度 {"error":400,"message":"only 2000 urls are allowed once"} \n
+    private static  int $listRows = 2000;  
     public static function getInstance( ) {
 
  
@@ -42,9 +43,27 @@ class SitemapClass
     }
     private static function init()
     {
+        self::setListRows(  2000);
+        self::set_file_max_length(2000);
         self::setConfig();
     }
 
+    // file_max_length 
+private static function set_file_max_length(int $file_max_length = 0){
+    self::$file_max_length = $file_max_length;
+} 
+private static function get_file_max_length() : int {
+    return self::$file_max_length;
+}
+//
+//  
+private static function setListRows(int $rows): void {
+    self::$listRows = $rows;
+}
+
+private static function getListRows(): int {
+    return self::$listRows;
+}
 
     public static function setArgs(array $args = []) : void
     {
@@ -89,13 +108,14 @@ class SitemapClass
  
 
 private static function getAllData(): array {
-    $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
- 
- 
-    $results ['data']['lastsql'] = [];
-    $results ['data']['file_index'] =0;
-    $results ['data']['url_arr'] = [];
-    $results ['data']['error_arr'] = [];
+    $results = ['code' => 500, 'msg' => 'Failed', 'data' => [
+    'lastsql' => [],
+    'url_index' =>0,
+    'url_arr'=> [],
+    'error_arr' => [],
+    ]];
+    $url_arr = [];
+    $url_index = 0;
     $config = self::getConfig(); 
  
     foreach ( $config['scan_url_list'] AS $key => $item ) {
@@ -104,7 +124,7 @@ private static function getAllData(): array {
         // $url =  $item['loc']   ;
         $joinStr = isset($item['joinStr']) ? $item['joinStr'] : '';
         $counts = myDatabase::getInstance()->getCounts($item['tablename'],$item['whereStr'], $joinStr  );
-        $results['data']['lastsql'][] = myDatabase::getInstance()::getLastSql() ;
+        $results['data']['lastsql'][$key]['counts'] = myDatabase::getInstance()::getLastSql() ;
         if ( $counts['code'] != 200 && $counts['data']['count'] ==  0 ) {
             // 跳过 foreach 
             echo '|----- 跳过 foreach ' . $key . ' ----|' . PHP_EOL; // 换行符
@@ -115,35 +135,42 @@ private static function getAllData(): array {
 
 
         
-        $listRows = 2000;  
-        $pageCount =  ceil( $counts['data']['count']   / $listRows)  ;
+ 
+        $pageCount =  ceil( $counts['data']['count']   / self::getListRows() )  ;
         for ($page = 0; $page < $pageCount; $page++) {
-            $offset = $page * $listRows;// joinStr
+            $offset = $page * self::getListRows() ;// joinStr
             $joinStr = isset($item['joinStr']) ? $item['joinStr'] : '';
-            $item_data =  myDatabase::getInstance()->getdata($offset, $listRows, $item['field'],  $joinStr, $item['whereStr'], $item['tablename'], $item['key']);
-            $results['data']['lastsql'][] = myDatabase::getInstance()::getLastSql() ;
+            $item_data =  myDatabase::getInstance()->getdata($offset, self::getListRows() , $item['field'],  $joinStr, $item['whereStr'], $item['tablename'], $item['key']);
+            $results['data']['lastsql'][$key]['lists'] == myDatabase::getInstance()::getLastSql() ;
             if ( $item_data['code'] != 200 ) {
                 echo '|----- 跳过 for page' . $page . ' ----|' . PHP_EOL; // 换行符
                 $results ['data']['error_arr'][] =   myDatabase::getInstance()::getLastError();   //$db::getMessage(); 
             }
  
      
-            echo     "|----- for page:: /{$page}当前页" .$offset. "/一页多少{$listRows}条，" .       "/总{$pageCount}页" .      "/共 ".$counts['data']['count'] ."条记录" ;
+            echo     "|----- for page:: /{$page}当前页" .$offset. "/一页多少".self::getListRows()."条，" .       "/总{$pageCount}页" .      "/共 ".$counts['data']['count'] ."条记录" ;
             foreach (  $item_data['data']   AS $keys => $value) {
-                $results ['data']['file_index'] = $results ['data']['file_index']  + 1;
+                $url_index++;
+ 
                 $priority  =   ( mt_rand(1, 10) / 10);
-                $id =  $value[ $item ['key'] ];
-                $url = str_replace('{{id}}', $id, $item['loc']); // Replace {{id}} with $id
-                $q = ['a' =>  '', 'loc'=> $url  , 'id'=>  $id , 'title_ru'=>"" , 'title_en'=>"" , 'title'=> $value['title'],'times'=> $value['times'],'priority'=> $priority  ];
-                echo "|-----item: ".json_encode( $q, JSON_UNESCAPED_UNICODE) .  ' ----|' . PHP_EOL; // 换行符  ).'--|'.PHP_EOL;
-                echo '|-----INDEX: '.$key .' ,  file_index:' . $results ['data']['file_index'] .'     ' . 'id:  ' .  $value[ $item ['key'] ].  ' ----|' . PHP_EOL; // 换行符
+                $id = '';
+                $url =  $item['loc'] ; 
+                if ( isset($item ['key'] )){ 
+                    $id =  $value[ $item ['key'] ];
+                    $url = str_replace('{{id}}', $id, $item['loc']); // Replace {{id}} with $id
+                }
+         
+                $url_arr[] = $q = ['a' =>  '', 'loc'=> $url  , 'id'=>  $id , 'title_ru'=>"" , 'title_en'=>"" , 'title'=> $value['title'],'times'=> $value['times'],'priority'=> $priority  ];
+                // echo "|-----item: ".json_encode( $q, JSON_UNESCAPED_UNICODE) .  ' ----|' . PHP_EOL; // 换行符  ).'--|'.PHP_EOL;
+                echo '|-----INDEX: '.$key .' ,  url_index:' . $url_index .'     ' . 'id:  ' .  $value[ $item ['key'] ].  ' ----|' . PHP_EOL; // 换行符
             }
         }
   
  
         echo '|----- -------'.PHP_EOL;
     }
- 
+    $results ['data']['url_arr'] =  $url_arr;
+    $results ['data']['url_index'] =  $url_index;
     return $results;
 }
 
@@ -153,34 +180,43 @@ private static function getAllData(): array {
 
 // urllist.txt  2025-04-10  13:30:32  12610148
 //$prefix = ""
-private static function GenerateAllFiles( int $FILE_MAX_LENGTH = 2000 ) :array|string {
+private static function GenerateAllFiles( ) :array|string {
     $results = ['code' => 500, 'msg' => 'Failed', 'data' => [],'ExecuteCommand' =>  "php  test.php type=txt   (xml|txt|html)",   'error' => '', 'lastsql' => null,   'tempfile'=> " ", 'index' =>  null,  "time:" => date('Y-m-d H:i:s', time())] ;
-    $results ['data']['generate_file_index'] =0;
-    // $FILE_MAX_LENGTH = 2000;// 每一个文件的最大长度 {"error":400,"message":"only 2000 urls are allowed once"} \n
+    $results ['data']['url_index'] =0;
  
 
     $config = self::getConfig();//_config();
     $start = microtime(true);
     try {
-        $url_arr = [];
+       
         header("Content-Type: text/plain");
-        $ss = self::getAllData();
-        $results ['data']['error_arr']         = $ss['data']['error_arr'];
- 
-        $results  ['data']['file_index']     = $ss['data']['file_index'];
+        $getAllData = self::getAllData();
+        $results ['data']['error_arr']         = $getAllData['data']['error_arr'];
+        $results['data']['lastsql'] = $getAllData['data']['lastsql'];
+   
+        echo '|----- 动态的 URLS ----|' . PHP_EOL; // 换行符
+        //动态的 URLS
+        $url_index   = $getAllData['data']['url_index']  ; 
+        $url_arr     = $getAllData['data']['url_arr']  ;
          //静态的 URLS
          echo '|----- 静态的 URLS ----|' . PHP_EOL; // 换行符
-         echo '|----- ' . $results ['data']['generate_file_index'] . ' ----|' . PHP_EOL; // 换行符
          foreach (  $config['static_urls'] AS $key => $item ) {
-            $results ['data']['generate_file_index'] ++;
-             echo '|-----INDEX static_urls ' . $results ['data']['generate_file_index'] . ' ----|' . PHP_EOL; // 换行符
-             $url_arr [ ] = ['a' =>  "", 'loc'=> $item['loc'] , 'id'=> $item['id'] ,  'title_ru'=> $item['title_ru']   ,  'title_en'=> $item['title_en']   , 'title'=> $item['title'] ,'times'=>$item['times'] ,'priority'=> $item['priority']   ];
-         }     //静态的 URLS
-        $splitArray = array_chunk($url_arr, $FILE_MAX_LENGTH);
-        // 输出分割后的数组
+            $url_index++;
+             echo '|-----INDEX static_urls url_index: ' . $url_index. ' ----|' . PHP_EOL; // 换行符
+             $id = isset( $item['id']  ) ? $item['id'] : '';
+             $url_arr [ ] = ['a' =>  "", 'loc'=> $item['loc'] , 'id'=>   $id ,  'title_ru'=> $item['title_ru']   ,  'title_en'=> $item['title_en']   , 'title'=> $item['title'] ,'times'=>$item['times'] ,'priority'=> $item['priority']   ];
+         }    
+         
+         $results ['data']['url_index'] =$url_index;
+         //静态的 URLS end 
+                 $splitArray = array_chunk($url_arr, self::get_file_max_length() );
+//  
+
+
+        // // 输出分割后的数组
         $split_file_index = 0;
         $filenames = [];
-        foreach ($splitArray as $v) {
+        foreach ($splitArray AS $index => $data) {
             if( $split_file_index > 0){
                 $filenames['txt'] =    'urls-'.$split_file_index.'.txt';
                 $filenames['xml']  =    'sitemap-'.$split_file_index.'.xml';
@@ -190,7 +226,7 @@ private static function GenerateAllFiles( int $FILE_MAX_LENGTH = 2000 ) :array|s
                 $filenames['xml']  =    'sitemap.xml';
                 $filenames['html']  = 'sitemap.html';
             }
-            self::Generatefiles(   $v,  $filenames);//生成文件
+            self::Generatefiles(   $data,  $filenames);//生成文件
             $split_file_index ++;
         }
 
@@ -203,36 +239,11 @@ private static function GenerateAllFiles( int $FILE_MAX_LENGTH = 2000 ) :array|s
         return $results;
     }
  
-    // 
-    foreach($config['site_list'] AS $site_key => $site_value) { //prefix  domain
-        
-        // $config['file_dir']
-        if ( !is_dir( $config['file_dir']  ) ){
-            mkdir( $config['file_dir'], 0777 , true );
-        }
-        // if  //chmod
-        chmod( $config['file_dir'], 0777 );
-        // 
- 
-      
+    // sitemap_index
 
-        $index_xml =  $config['file_dir'].'/'.$site_value['prefix']. 'sitemap_index.xml';
-        $index_xml_stream = fopen(    $index_xml, "w") or die("Error: Could not create temporary file ".    $index_xml." \n");
-        $index_xml_sitemap = new SitemapIndex( $index_xml);//__DIR__ . '/sitemap.xml');
-        $len = ceil( $split_file_index  / $FILE_MAX_LENGTH); // Calculate the number of files needed
-        for ($i = 0; $i < $len; $i++) {
-            $times = time();
-            $router_url = '/sitemap.xml';
-            if(  $i > 0){
-                $router_url = '/sitemap-'.$i.'.xml';
-            }
-            $index_xml_sitemap->addSitemap( $site_value['domain'].$router_url,  $times, null, null);
-        }
-        $index_xml_sitemap->write();
-        chmod($index_xml ,  $config['permissions'] );
-        unset($index_xml_stream);
-    }
+    self::sitemap_index($url_index  );
 
+//sitemap_index
 
 
     $sourceDir = rtrim($config['file_dir'], '/') . '/';
@@ -360,7 +371,37 @@ private static function Generatefiles($datas,$filenames): array  {
     return  $result;
 }
 //-----------------  
+ private static function sitemap_index ($url_index  ){ 
+    $config = self::getConfig();//_config();
+    foreach($config['site_list'] AS $site_key => $site_value) { //prefix  domain
+        
+        // $config['file_dir']
+        if ( !is_dir( $config['file_dir']  ) ){
+            mkdir( $config['file_dir'], 0777 , true );
+        }
+        // if  //chmod
+        chmod( $config['file_dir'], 0777 );
+        // 
+ 
+      
 
+        $index_xml =  $config['file_dir'].'/'.$site_value['prefix']. 'sitemap_index.xml';
+        $index_xml_stream = fopen(    $index_xml, "w") or die("Error: Could not create temporary file ".    $index_xml." \n");
+        $index_xml_sitemap = new SitemapIndex( $index_xml);//__DIR__ . '/sitemap.xml');
+        $len = ceil( $url_index  / self::get_file_max_length()  ); // Calculate the number of files needed  = 2000;// 每一个文件的最大长度 {"error":400,"message":"only 2000 urls are allowed once"} \n
+        for ($i = 0; $i < $len; $i++) {
+            $times = time();
+            $router_url = '/sitemap.xml';
+            if(  $i > 0){
+                $router_url = '/sitemap-'.$i.'.xml';
+            }
+            $index_xml_sitemap->addSitemap( $site_value['domain'].$router_url,  $times, null, null);
+        }
+        $index_xml_sitemap->write();
+        chmod($index_xml ,  $config['permissions'] );
+        unset($index_xml_stream);
+    }
+}
   
 //------
 }

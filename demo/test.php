@@ -23,8 +23,8 @@ define("myAPP_RUNRIMT_PATH", __DIR__."/runtime/");
 $App =   myApp::getInstance( );   
 // $result = $App->getuserinfo(30312 );
 $result = $App->run_sitemap();
-
-echo json_encode($result, JSON_UNESCAPED_UNICODE);
+var_dump($result); 
+// echo json_encode($result, JSON_UNESCAPED_UNICODE);
 
 
 

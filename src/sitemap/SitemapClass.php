@@ -1,15 +1,16 @@
 <?php
 
-namespace Suxianjia\Xianjiasitemap\sitemap;
+namespace Suxianjia\xianjiasitemap\sitemap;
 
-use Suxianjia\Xianjiasitemap\orm\pdo as db;
+use Suxianjia\xianjiasitemap\orm\pdo as db;
 
-use Suxianjia\Xianjiasitemap\client\Sitemap;
-use Suxianjia\Xianjiasitemap\client\SitemapIndex;
-use Suxianjia\Xianjiasitemap\client\SitemapHtml;
+use Suxianjia\xianjiasitemap\client\Sitemap;
+use Suxianjia\xianjiasitemap\client\SitemapIndex;
+use Suxianjia\xianjiasitemap\client\SitemapHtml;
 
 date_default_timezone_set('PRC');
 require __DIR__ . '/../fun.php';
+use Suxianjia\xianjiasitemap\myConfig;
 class SitemapClass
 {
     /**
@@ -18,6 +19,32 @@ class SitemapClass
     private static $config;
 
     private static $args;
+    private static $instance;
+
+    public static function getInstance( ) {
+
+ 
+
+
+        if (self::$instance === null) {
+            
+            self::init();
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
+
+    private function __construct()
+    {
+        //...
+    }
+    private static function init()
+    {
+        self::setConfig();
+    }
+
+
     public static function setArgs(array $args = []) : void
     {
         $args['type'] = $args['type'] ?? "xml";
@@ -27,7 +54,8 @@ class SitemapClass
 
     public static function setConfig(array $array = []):  void
     {
-        self::$config = ConfigClass::getInstance()::setConfig($array)::getConfig();
+        // self::$config = ConfigClass::getInstance()::setConfig($array)::getConfig();
+        self::$config = myConfig::getInstance()::getSitemapConfig();
 
     }
 

@@ -1,9 +1,9 @@
 <?php 
-namespace Suxianjia\xianjiaorm;
-use Suxianjia\xianjiaorm\myConfig;
+namespace Suxianjia\xianjiasitemap;
+use Suxianjia\xianjiasitemap\myConfig;
 use Exception;
 use Suxianjia\xianjiaorm\orm\myDatabase;
- 
+use Suxianjia\Xianjiasitemap\sitemap\SitemapClass;
 use Suxianjia\xianjialogwriter\client\myLogClient;
 if (!defined('myAPP_VERSION')) {        exit('myAPP_VERSION is not defined'); }
 if (!defined('myAPP_ENV')  ) {          exit ('myAPP_ENV is not defined'); }
@@ -37,6 +37,26 @@ class myApp {
     private static function init () {
  
     }
+
+
+
+//  php example_bin/test.php type=txt
+    //  use Suxianjia\Xianjiasitemap\sitemap\SitemapClass;
+
+    public function run_sitemap(array  $args = []): array|string
+    {
+        $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
+        // $this_config = require __DIR__ . '/config.php';
+$app = SitemapClass::getInstance();
+$app::setArgs($args);
+        // SitemapClass::setConfig( $this_config );
+        $results['data']['results'] =  $app::generate();
+        return $results;
+    }
+
+
+
+
 
 
     public function getuserinfo ($id ): array {

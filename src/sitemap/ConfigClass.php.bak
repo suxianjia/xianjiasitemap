@@ -1,6 +1,6 @@
 <?php
 
-namespace Suxianjia\Xianjiasitemap\sitemap;
+namespace Suxianjia\xianjiasitemap\sitemap;
 
 class ConfigClass
 {

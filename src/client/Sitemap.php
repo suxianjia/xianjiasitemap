@@ -1,5 +1,5 @@
 <?php
-namespace Suxianjia\Xianjiasitemap\client;
+namespace Suxianjia\xianjiasitemap\client;
 use XMLWriter;
 
 

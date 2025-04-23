@@ -1,7 +1,7 @@
 <?php
  include_once __DIR__."/../vendor/autoload.php";
-use Suxianjia\xianjiaorm\myConfig;
-use Suxianjia\xianjiaorm\myApp;
+use Suxianjia\xianjiasitemap\myConfig;
+use Suxianjia\xianjiasitemap\myApp;
  
  
 
@@ -21,7 +21,8 @@ define("myAPP_RUNRIMT_PATH", __DIR__."/runtime/");
 
  
 $App =   myApp::getInstance( );   
-$result = $App->getuserinfo(30312 );
+// $result = $App->getuserinfo(30312 );
+$result = $App->run_sitemap();
 
 echo json_encode($result, JSON_UNESCAPED_UNICODE);
 

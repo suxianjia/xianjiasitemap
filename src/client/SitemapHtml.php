@@ -1,6 +1,6 @@
 <?php
 
-namespace Suxianjia\Xianjiasitemap\client;
+namespace Suxianjia\xianjiasitemap\client;
 
 date_default_timezone_set('PRC');
  

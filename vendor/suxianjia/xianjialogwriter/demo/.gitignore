@@ -1,7 +1,0 @@
-!.gitignore
-temp/*
-tempImagePath/*
-index.php
-index.html
-runtime/*
-config.dev.php

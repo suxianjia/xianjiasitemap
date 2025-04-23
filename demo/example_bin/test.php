@@ -16,7 +16,7 @@ use Suxianjia\Xianjiasitemap\sitemap\SitemapClass;
 class index {
 
     //  php example_bin/test.php type=txt
-    //  php example_bin/test.php type=xml
+    //  use Suxianjia\Xianjiasitemap\sitemap\SitemapClass;
 
     public function run(array  $args = []): array|string
     {

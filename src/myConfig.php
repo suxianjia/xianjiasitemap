@@ -1,5 +1,5 @@
 <?php 
-namespace Suxianjia\xianjialogwriter;
+namespace Suxianjia\xianjiasitemap;
 use Exception;
  
 if (!defined('myAPP_VERSION')) {        exit('myAPP_VERSION is not defined'); }
@@ -209,7 +209,13 @@ private static function setUserConfigFile(  ){
         $data['log_file_path'] =   self::$runtime_path = myAPP_RUNRIMT_PATH;
         return  $data['log_file_path'] ?? '';// $log_file 
     }
- 
+ //--- 
+     // sitemap
+     public static function getSitemapConfig($type = 'sitemap') {
+        $data = self::getAllConfig ();
+        return $data[$type] ?? [];
+    }
+
  
       
 }

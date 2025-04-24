@@ -23,6 +23,14 @@ class SitemapClass
     private static $instance;
     private static  int $file_max_length = 2000; //    // $file_max_length = 2000;// 每一个文件的最大长度 {"error":400,"message":"only 2000 urls are allowed once"} \n
     private static  int $listRows = 2000;  
+
+
+
+    private static string $sourceDir;
+    private static string $targetDir; 
+
+
+
     public static function getInstance( ) {
 
  
@@ -46,6 +54,15 @@ class SitemapClass
         self::setListRows(  2000);
         self::set_file_max_length(2000);
         self::setConfig();
+        $config = self::getConfig();
+        self::set_sourceDir( $config['file_dir'] );
+        self::set_targetDir( $config["target_directory"] );
+        // 清空 $sourceDir 文件夹下的所有文件   的旧文件 
+        self::clearDir(self::get_sourceDir());
+ 
+
+
+
     }
 
     // file_max_length 
@@ -119,10 +136,10 @@ private static function getAllData(): array {
     $config = self::getConfig(); 
  
     foreach ( $config['scan_url_list'] AS $key => $item ) {
-        echo '|----- foreach ' . $key . ' ----|' . PHP_EOL; // 换行符
+        echo '|----- 开始 foreach ' . $key . ' ----|' . PHP_EOL; // 换行符
         //       'status' => 1,//1:开启 0:关闭    
         if ( !isset($item['status']) || $item['status'] != 1 ) {
-            echo '|----- 跳过 foreach  item[status] ' . $item['status'] . ' ----|' . PHP_EOL; // 换行符
+            echo '|----- 跳过 foreach  item[status]  ----|' . PHP_EOL; // 换行符
             continue;
         }
         // $url = rtrim($item['loc'], '*')  ;
@@ -258,8 +275,8 @@ private static function GenerateAllFiles( ) :array|string {
 //sitemap_index
 
 
-    $sourceDir = rtrim($config['file_dir'], '/') . '/';
-    $targetDir = rtrim($config["target_directory"], '/') . '/';
+    $sourceDir = self::get_sourceDir();     // rtrim($config['file_dir'], '/') . '/';
+    $targetDir = self::get_targetDir() ;    // rtrim($config["target_directory"], '/') . '/';
 
     if (!is_dir($sourceDir)) {
         throw new \Exception("Source directory does not exist: " . $sourceDir);
@@ -294,6 +311,41 @@ private static function GenerateAllFiles( ) :array|string {
     return $results;
 }
 
+// sourceDir
+
+/**
+ * Clears all files in the specified directory.
+ *
+ * @param string $dir The directory to clear.
+ * @return void
+ */
+private static function clearDir(string $dir): void {
+    if (!is_dir($dir)) {
+        return;
+    }
+    $files = glob($dir . '*');
+    foreach ($files as $file) {
+        if (is_file($file)) {
+            echo "Clears file: $file" .PHP_EOL;
+            unlink($file);
+        }
+    }
+}
+
+private static function set_sourceDir(string $path = '') {
+        self::$sourceDir = rtrim($path, '/') . '/';
+}
+// get sourceDir
+private static function get_sourceDir() {
+    return self::$sourceDir;
+}
+private static function set_targetDir(string $path = '') {
+    self::$targetDir = rtrim($path, '/') . '/';
+}
+
+private static function get_targetDir() {
+    return self::$targetDir;
+}
 
 
 //------------ 生成今天的数据
@@ -318,7 +370,9 @@ private static function Generatefiles($datas,$filenames): array  {
         $config = self::getConfig(); 
         foreach($config['site_list'] AS $key => $value) { //prefix  domain
             foreach ($filenames as $filename_k => $filename_v) {
-                $file[$filename_k] = $config['file_dir'].'/'.$value['prefix'].$filename_v;
+                $sourceDir = self::get_sourceDir();
+                // $file[$filename_k] = $config['file_dir'].'/'.$value['prefix'].$filename_v;
+                $file[$filename_k] = $sourceDir .'/'.$value['prefix'].$filename_v;
                 $file_stream = fopen($file[$filename_k], "w") or die("Error: Could not create temporary file ".$file[$filename_k]." \n");
                 if ($filename_k == 'txt') {
                     foreach ($datas as $k => $v) { 
@@ -386,18 +440,18 @@ private static function Generatefiles($datas,$filenames): array  {
  private static function sitemap_index ($url_index  ){ 
     $config = self::getConfig();//_config();
     foreach($config['site_list'] AS $site_key => $site_value) { //prefix  domain
-        
+        $sourceDir = self::get_sourceDir();
         // $config['file_dir']
-        if ( !is_dir( $config['file_dir']  ) ){
-            mkdir( $config['file_dir'], 0777 , true );
+        if ( !is_dir(  $sourceDir   ) ){
+            mkdir(  $sourceDir , 0777 , true );
         }
         // if  //chmod
-        chmod( $config['file_dir'], 0777 );
+        chmod(  $sourceDir , 0777 );
         // 
  
       
 
-        $index_xml =  $config['file_dir'].'/'.$site_value['prefix']. 'sitemap_index.xml';
+        $index_xml =   $sourceDir.'/'.$site_value['prefix']. 'sitemap_index.xml';
         $index_xml_stream = fopen(    $index_xml, "w") or die("Error: Could not create temporary file ".    $index_xml." \n");
         $index_xml_sitemap = new SitemapIndex( $index_xml);//__DIR__ . '/sitemap.xml');
         $len = ceil( $url_index  / self::get_file_max_length()  ); // Calculate the number of files needed  = 2000;// 每一个文件的最大长度 {"error":400,"message":"only 2000 urls are allowed once"} \n

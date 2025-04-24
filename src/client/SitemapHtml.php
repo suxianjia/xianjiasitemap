@@ -50,7 +50,7 @@ class SitemapHtml
 		$html .= "<h1>Sitemap</h1>\n<ul>\n";
 
 		foreach ($this->items as $item) {
-			$html .= "<li> <a href=\"{$item['location']}\" title=\"{$item['title']}\">{$item['title']}</a> </li>\n";
+			$html .= "<li> <a target=\"_blank\"  href=\"{$item['location']}\" title=\"{$item['title']}\">{$item['title']}</a> </li>\n";
 		}
 
 		$html .= "</ul>\n</body>\n</html>";

@@ -124,6 +124,7 @@ private static function getAllData(): array {
         // $url =  $item['loc']   ;
         $joinStr = isset($item['joinStr']) ? $item['joinStr'] : '';
         $counts = myDatabase::getInstance()->getCounts($item['tablename'],$item['whereStr'], $joinStr  );
+        // echo myDatabase::getInstance()::getLastSql() ; exit;
         $results['data']['lastsql'][$key]['counts'] = myDatabase::getInstance()::getLastSql() ;
         if ( $counts['code'] != 200 && $counts['data']['count'] ==  0 ) {
             // 跳过 foreach 
@@ -141,6 +142,7 @@ private static function getAllData(): array {
             $offset = $page * self::getListRows() ;// joinStr
             $joinStr = isset($item['joinStr']) ? $item['joinStr'] : '';
             $item_data =  myDatabase::getInstance()->getdata($offset, self::getListRows() , $item['field'],  $joinStr, $item['whereStr'], $item['tablename'], $item['key']);
+            // echo   myDatabase::getInstance()::getLastSql() ;
             $results['data']['lastsql'][$key]['lists'] = myDatabase::getInstance()::getLastSql() ;
             if ( $item_data['code'] != 200 ) {
                 echo '|----- 跳过 for page' . $page . ' ----|' . PHP_EOL; // 换行符
@@ -156,6 +158,11 @@ private static function getAllData(): array {
                 $id = '';
                 $url =  $item['loc'] ; 
                 if ( isset($item ['key'] )){ 
+
+                    if (strpos($item['key'], '.') !== false) {
+                        $parts = explode('.', $item['key']);
+                        $item['key'] = end($parts); // Take the last part after splitting
+                    }  
                     $id =  $value[ $item ['key'] ];
                     $url = str_replace('{{id}}', $id, $item['loc']); // Replace {{id}} with $id
                 }

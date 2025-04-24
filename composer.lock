@@ -45,16 +45,16 @@
         },
         {
             "name": "suxianjia/xianjiaorm",
-            "version": "v2.0.8",
+            "version": "v2.0.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/suxianjia/xianjiaorm.git",
-                "reference": "18054ecce33d80e2ee7aaec6f499c7bf494e2390"
+                "reference": "044e91667468c2ad98ca546c1d1397d0a7773595"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/suxianjia/xianjiaorm/zipball/18054ecce33d80e2ee7aaec6f499c7bf494e2390",
-                "reference": "18054ecce33d80e2ee7aaec6f499c7bf494e2390",
+                "url": "https://api.github.com/repos/suxianjia/xianjiaorm/zipball/044e91667468c2ad98ca546c1d1397d0a7773595",
+                "reference": "044e91667468c2ad98ca546c1d1397d0a7773595",
                 "shasum": ""
             },
             "require": {
@@ -77,9 +77,9 @@
             "description": "xianjiaorm",
             "support": {
                 "issues": "https://github.com/suxianjia/xianjiaorm/issues",
-                "source": "https://github.com/suxianjia/xianjiaorm/tree/v2.0.8"
+                "source": "https://github.com/suxianjia/xianjiaorm/tree/v2.0.9"
             },
-            "time": "2025-04-23T02:21:24+00:00"
+            "time": "2025-04-24T00:41:45+00:00"
         }
     ],
     "packages-dev": [],

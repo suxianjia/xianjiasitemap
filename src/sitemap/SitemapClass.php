@@ -120,6 +120,11 @@ private static function getAllData(): array {
  
     foreach ( $config['scan_url_list'] AS $key => $item ) {
         echo '|----- foreach ' . $key . ' ----|' . PHP_EOL; // 换行符
+        //       'status' => 1,//1:开启 0:关闭    
+        if ( !isset($item['status']) || $item['status'] != 1 ) {
+            echo '|----- 跳过 foreach  item[status] ' . $item['status'] . ' ----|' . PHP_EOL; // 换行符
+            continue;
+        }
         // $url = rtrim($item['loc'], '*')  ;
         // $url =  $item['loc']   ;
         $joinStr = isset($item['joinStr']) ? $item['joinStr'] : '';
@@ -402,7 +407,7 @@ private static function Generatefiles($datas,$filenames): array  {
             if(  $i > 0){
                 $router_url = '/sitemap-'.$i.'.xml';
             }
-            $index_xml_sitemap->addSitemap( $site_value['domain'].$router_url,  $times, null, null);
+            $index_xml_sitemap->addSitemap( $site_value['domain'].$router_url,  $times );
         }
         $index_xml_sitemap->write();
         chmod($index_xml ,  $config['permissions'] );
